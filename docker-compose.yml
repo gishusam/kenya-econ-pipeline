@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: kenya_econ_db
+    environment:
+      POSTGRES_DB: kenya_econ
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d kenya_econ"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: python:3.13-slim
+    container_name: kenya_econ_app
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=kenya_econ
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - OPEN_EXCHANGE_APP_ID=${OPEN_EXCHANGE_APP_ID}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "pip install -r requirements.txt -q &&
+             python -m db.migrate &&
+             python -m db.loaders.worldbank_loader &&
+             python -m db.loaders.fx_loader"
+
+volumes:
+  postgres_data:

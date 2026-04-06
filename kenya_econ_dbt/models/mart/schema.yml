@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: kenya_macro
+    description: >
+      Core Kenya macroeconomic mart. Combines GDP, inflation and
+      live FX rate. GDP expressed in both USD and KES.
+    columns:
+      - name: year
+        tests: [not_null]
+      - name: gdp_usd_billions
+        tests: [not_null]
+      - name: gdp_kes_billions
+        tests: [not_null]
+
+  - name: fx_daily_summary
+    description: "Daily min, max and average KES/USD from hourly snapshots"
+    columns:
+      - name: rate_date
+        tests: [not_null, unique]
+      - name: rate_avg
+        tests: [not_null]
+
+  - name: purchasing_power
+    description: >
+      Flagship metric. Combines inflation erosion and KES depreciation
+      into a single index. Lower = weaker purchasing power.
+    columns:
+      - name: year
+        tests: [not_null]
+      - name: purchasing_power_index
+        tests: [not_null]

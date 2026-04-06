@@ -1,0 +1,34 @@
+version: 2
+
+sources:
+  - name: staging
+    schema: staging
+    tables:
+      - name: stg_worldbank_gdp
+      - name: stg_worldbank_inflation
+      - name: stg_fx_rates
+
+models:
+  - name: stg_gdp
+    description: "Kenya GDP cleaned from World Bank staging table"
+    columns:
+      - name: year
+        tests: [not_null]
+      - name: value_usd
+        tests: [not_null]
+
+  - name: stg_inflation
+    description: "Kenya CPI inflation rate from World Bank"
+    columns:
+      - name: year
+        tests: [not_null]
+      - name: inflation_pct
+        tests: [not_null]
+
+  - name: stg_fx
+    description: "KES exchange rates enriched with derived columns"
+    columns:
+      - name: kes_per_usd
+        tests: [not_null]
+      - name: rate_timestamp
+        tests: [not_null]
