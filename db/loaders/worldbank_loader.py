@@ -57,7 +57,9 @@ def load_to_staging_gdp():
                   AND s.is_current = TRUE
                   AND s.value_usd = r.value
             )
+            ON CONFLICT DO NOTHING
         """)
+
         logger.info("Staging GDP load complete (SCD2 dedup applied)")
 
 def load_to_staging_inflation():
@@ -79,6 +81,7 @@ def load_to_staging_inflation():
                   AND s.is_current = TRUE
                   AND s.inflation_pct = r.value
             )
+            ON CONFLICT DO NOTHING
         """)
         logger.info("Staging inflation load complete")
 

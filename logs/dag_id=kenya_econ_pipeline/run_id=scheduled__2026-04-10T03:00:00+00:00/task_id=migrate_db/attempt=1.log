@@ -1,0 +1,36 @@
+[2026-04-12T13:50:49.870+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: kenya_econ_pipeline.migrate_db scheduled__2026-04-10T03:00:00+00:00 [queued]>
+[2026-04-12T13:50:49.908+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: kenya_econ_pipeline.migrate_db scheduled__2026-04-10T03:00:00+00:00 [queued]>
+[2026-04-12T13:50:49.909+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 4
+[2026-04-12T13:50:49.928+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): migrate_db> on 2026-04-10 03:00:00+00:00
+[2026-04-12T13:50:49.965+0000] {standard_task_runner.py:60} INFO - Started process 17895 to run task
+[2026-04-12T13:50:49.984+0000] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'kenya_econ_pipeline', 'migrate_db', 'scheduled__2026-04-10T03:00:00+00:00', '--job-id', '35', '--raw', '--subdir', 'DAGS_FOLDER/kenya_econ_dag.py', '--cfg-path', '/tmp/tmpmuq041xe']
+[2026-04-12T13:50:49.993+0000] {standard_task_runner.py:88} INFO - Job 35: Subtask migrate_db
+[2026-04-12T13:50:50.251+0000] {task_command.py:423} INFO - Running <TaskInstance: kenya_econ_pipeline.migrate_db scheduled__2026-04-10T03:00:00+00:00 [running]> on host 2f11af39ed07
+[2026-04-12T13:50:50.542+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='samwel' AIRFLOW_CTX_DAG_ID='kenya_econ_pipeline' AIRFLOW_CTX_TASK_ID='migrate_db' AIRFLOW_CTX_EXECUTION_DATE='2026-04-10T03:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-04-10T03:00:00+00:00'
+[2026-04-12T13:50:50.601+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T13:50:50.601785+00:00", "level": "INFO", "module": "db.migrate", "message": "Running migration: 001_create_schemas.sql"}
+[2026-04-12T13:50:50.601+0000] {migrate.py:15} INFO - Running migration: 001_create_schemas.sql
+[2026-04-12T13:50:50.706+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T13:50:50.705814+00:00", "level": "ERROR", "module": "db.connection", "message": "Transaction rolled back: duplicate key value violates unique constraint \"pg_namespace_nspname_index\"\nDETAIL:  Key (nspname)=(raw) already exists.\n"}
+[2026-04-12T13:50:50.704+0000] {connection.py:29} ERROR - Transaction rolled back: duplicate key value violates unique constraint "pg_namespace_nspname_index"
+DETAIL:  Key (nspname)=(raw) already exists.
+
+[2026-04-12T13:50:50.714+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/kenya_econ_dag.py", line 18, in run_migrations
+    migrate()
+  File "/opt/airflow/db/migrate.py", line 17, in run_migrations
+    cur.execute(f.read())
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "pg_namespace_nspname_index"
+DETAIL:  Key (nspname)=(raw) already exists.
+
+[2026-04-12T13:50:50.810+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=kenya_econ_pipeline, task_id=migrate_db, execution_date=20260410T030000, start_date=20260412T135049, end_date=20260412T135050
+[2026-04-12T13:50:50.869+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 35 for task migrate_db (duplicate key value violates unique constraint "pg_namespace_nspname_index"
+DETAIL:  Key (nspname)=(raw) already exists.
+; 17895)
+[2026-04-12T13:50:50.988+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2026-04-12T13:50:51.138+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

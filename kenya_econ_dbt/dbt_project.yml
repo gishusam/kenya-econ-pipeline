@@ -8,15 +8,16 @@ model-paths: ["models"]
 test-paths: ["tests"]
 analysis-paths: ["analyses"]
 macro-paths: ["macros"]
+seed-paths: ["seeds"]
+snapshot-paths: ["snapshots"]
 
 target-path: "target"
 clean-targets: ["target", "dbt_packages"]
 
 models:
-  kenya_econ_dbt:
-    staging:
-      +schema: staging
-      +materialized: view
-    mart:
-      +schema: mart
-      +materialized: table
+  staging:
+    +schema: staging
+    +materialized: view
+  mart:
+    +schema: mart
+    +materialized: table

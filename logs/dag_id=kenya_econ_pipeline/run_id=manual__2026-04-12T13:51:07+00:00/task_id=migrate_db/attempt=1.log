@@ -1,0 +1,27 @@
+[2026-04-12T13:51:09.075+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: kenya_econ_pipeline.migrate_db manual__2026-04-12T13:51:07+00:00 [queued]>
+[2026-04-12T13:51:09.081+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: kenya_econ_pipeline.migrate_db manual__2026-04-12T13:51:07+00:00 [queued]>
+[2026-04-12T13:51:09.081+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 4
+[2026-04-12T13:51:09.088+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): migrate_db> on 2026-04-12 13:51:07+00:00
+[2026-04-12T13:51:09.097+0000] {standard_task_runner.py:60} INFO - Started process 17920 to run task
+[2026-04-12T13:51:09.100+0000] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'kenya_econ_pipeline', 'migrate_db', 'manual__2026-04-12T13:51:07+00:00', '--job-id', '40', '--raw', '--subdir', 'DAGS_FOLDER/kenya_econ_dag.py', '--cfg-path', '/tmp/tmpzjdutfy5']
+[2026-04-12T13:51:09.102+0000] {standard_task_runner.py:88} INFO - Job 40: Subtask migrate_db
+[2026-04-12T13:51:09.134+0000] {task_command.py:423} INFO - Running <TaskInstance: kenya_econ_pipeline.migrate_db manual__2026-04-12T13:51:07+00:00 [running]> on host 2f11af39ed07
+[2026-04-12T13:51:09.178+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='samwel' AIRFLOW_CTX_DAG_ID='kenya_econ_pipeline' AIRFLOW_CTX_TASK_ID='migrate_db' AIRFLOW_CTX_EXECUTION_DATE='2026-04-12T13:51:07+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-04-12T13:51:07+00:00'
+[2026-04-12T13:51:09.193+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T13:51:09.193877+00:00", "level": "INFO", "module": "db.migrate", "message": "Running migration: 001_create_schemas.sql"}
+[2026-04-12T13:51:09.193+0000] {migrate.py:15} INFO - Running migration: 001_create_schemas.sql
+[2026-04-12T13:51:09.195+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T13:51:09.195006+00:00", "level": "INFO", "module": "db.migrate", "message": "Migration complete: 001_create_schemas.sql"}
+[2026-04-12T13:51:09.194+0000] {migrate.py:18} INFO - Migration complete: 001_create_schemas.sql
+[2026-04-12T13:51:09.195+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T13:51:09.195245+00:00", "level": "INFO", "module": "db.migrate", "message": "Running migration: 002_create_raw_tables.sql"}
+[2026-04-12T13:51:09.195+0000] {migrate.py:15} INFO - Running migration: 002_create_raw_tables.sql
+[2026-04-12T13:51:09.196+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T13:51:09.196739+00:00", "level": "INFO", "module": "db.migrate", "message": "Migration complete: 002_create_raw_tables.sql"}
+[2026-04-12T13:51:09.196+0000] {migrate.py:18} INFO - Migration complete: 002_create_raw_tables.sql
+[2026-04-12T13:51:09.196+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T13:51:09.196936+00:00", "level": "INFO", "module": "db.migrate", "message": "Running migration: 003_create_staging_tables.sql"}
+[2026-04-12T13:51:09.196+0000] {migrate.py:15} INFO - Running migration: 003_create_staging_tables.sql
+[2026-04-12T13:51:09.198+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T13:51:09.198499+00:00", "level": "INFO", "module": "db.migrate", "message": "Migration complete: 003_create_staging_tables.sql"}
+[2026-04-12T13:51:09.198+0000] {migrate.py:18} INFO - Migration complete: 003_create_staging_tables.sql
+[2026-04-12T13:51:09.198+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T13:51:09.198773+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T13:51:09.198+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T13:51:09.198+0000] {python.py:201} INFO - Done. Returned value was: None
+[2026-04-12T13:51:09.206+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=kenya_econ_pipeline, task_id=migrate_db, execution_date=20260412T135107, start_date=20260412T135109, end_date=20260412T135109
+[2026-04-12T13:51:09.248+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2026-04-12T13:51:09.266+0000] {taskinstance.py:3280} INFO - 2 downstream tasks scheduled from follow-on schedule check

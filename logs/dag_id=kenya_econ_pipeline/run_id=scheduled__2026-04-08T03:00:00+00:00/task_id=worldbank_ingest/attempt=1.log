@@ -1,0 +1,37 @@
+[2026-04-09T03:16:47.076+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: kenya_econ_pipeline.worldbank_ingest scheduled__2026-04-08T03:00:00+00:00 [queued]>
+[2026-04-09T03:16:47.154+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: kenya_econ_pipeline.worldbank_ingest scheduled__2026-04-08T03:00:00+00:00 [queued]>
+[2026-04-09T03:16:47.159+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 4
+[2026-04-09T03:16:47.249+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): worldbank_ingest> on 2026-04-08 03:00:00+00:00
+[2026-04-09T03:16:47.281+0000] {standard_task_runner.py:60} INFO - Started process 555 to run task
+[2026-04-09T03:16:47.349+0000] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'kenya_econ_pipeline', 'worldbank_ingest', 'scheduled__2026-04-08T03:00:00+00:00', '--job-id', '9', '--raw', '--subdir', 'DAGS_FOLDER/kenya_econ_dag.py', '--cfg-path', '/tmp/tmpuwx7hxr9']
+[2026-04-09T03:16:47.373+0000] {standard_task_runner.py:88} INFO - Job 9: Subtask worldbank_ingest
+[2026-04-09T03:16:47.666+0000] {task_command.py:423} INFO - Running <TaskInstance: kenya_econ_pipeline.worldbank_ingest scheduled__2026-04-08T03:00:00+00:00 [running]> on host 2f11af39ed07
+[2026-04-09T03:16:47.922+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='samwel' AIRFLOW_CTX_DAG_ID='kenya_econ_pipeline' AIRFLOW_CTX_TASK_ID='worldbank_ingest' AIRFLOW_CTX_EXECUTION_DATE='2026-04-08T03:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-04-08T03:00:00+00:00'
+[2026-04-09T03:16:47.991+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:16:47.990858+00:00", "level": "INFO", "module": "ingestion.worldbank", "message": "Fetching World Bank indicator: gdp"}
+[2026-04-09T03:16:47.990+0000] {worldbank.py:47} INFO - Fetching World Bank indicator: gdp
+[2026-04-09T03:16:47.993+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:16:47.993283+00:00", "level": "INFO", "module": "ingestion.base_client", "message": "GET https://api.worldbank.org/v2/country/KE/indicator/NY.GDP.MKTP.CD | params={'format': 'json', 'per_page': 10, 'mrv': 5}"}
+[2026-04-09T03:16:47.993+0000] {base_client.py:17} INFO - GET https://api.worldbank.org/v2/country/KE/indicator/NY.GDP.MKTP.CD | params={'format': 'json', 'per_page': 10, 'mrv': 5}
+[2026-04-09T03:17:06.031+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:17:06.027810+00:00", "level": "INFO", "module": "ingestion.base_client", "message": "GET https://api.worldbank.org/v2/country/KE/indicator/NY.GDP.MKTP.CD | params={'format': 'json', 'per_page': 10, 'mrv': 5}"}
+[2026-04-09T03:17:06.007+0000] {base_client.py:17} INFO - GET https://api.worldbank.org/v2/country/KE/indicator/NY.GDP.MKTP.CD | params={'format': 'json', 'per_page': 10, 'mrv': 5}
+[2026-04-09T03:17:07.303+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:17:07.303106+00:00", "level": "INFO", "module": "ingestion.base_client", "message": "Response 200 from https://api.worldbank.org/v2/country/KE/indicator/NY.GDP.MKTP.CD"}
+[2026-04-09T03:17:07.302+0000] {base_client.py:20} INFO - Response 200 from https://api.worldbank.org/v2/country/KE/indicator/NY.GDP.MKTP.CD
+[2026-04-09T03:17:07.309+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:17:07.309143+00:00", "level": "INFO", "module": "utils.validators", "message": "[worldbank/gdp] Validation passed for fields: ['metadata', 'data']"}
+[2026-04-09T03:17:07.309+0000] {validators.py:21} INFO - [worldbank/gdp] Validation passed for fields: ['metadata', 'data']
+[2026-04-09T03:17:07.314+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:17:07.314561+00:00", "level": "INFO", "module": "ingestion.worldbank", "message": "Saved gdp data to data/raw/worldbank/gdp_ke_20260409.json"}
+[2026-04-09T03:17:07.314+0000] {worldbank.py:42} INFO - Saved gdp data to data/raw/worldbank/gdp_ke_20260409.json
+[2026-04-09T03:17:07.315+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:17:07.315115+00:00", "level": "INFO", "module": "ingestion.worldbank", "message": "Fetching World Bank indicator: inflation"}
+[2026-04-09T03:17:07.315+0000] {worldbank.py:47} INFO - Fetching World Bank indicator: inflation
+[2026-04-09T03:17:07.315+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:17:07.315810+00:00", "level": "INFO", "module": "ingestion.base_client", "message": "GET https://api.worldbank.org/v2/country/KE/indicator/FP.CPI.TOTL.ZG | params={'format': 'json', 'per_page': 10, 'mrv': 5}"}
+[2026-04-09T03:17:07.315+0000] {base_client.py:17} INFO - GET https://api.worldbank.org/v2/country/KE/indicator/FP.CPI.TOTL.ZG | params={'format': 'json', 'per_page': 10, 'mrv': 5}
+[2026-04-09T03:53:01.136+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:53:01.134935+00:00", "level": "INFO", "module": "ingestion.base_client", "message": "GET https://api.worldbank.org/v2/country/KE/indicator/FP.CPI.TOTL.ZG | params={'format': 'json', 'per_page': 10, 'mrv': 5}"}
+[2026-04-09T03:53:01.132+0000] {base_client.py:17} INFO - GET https://api.worldbank.org/v2/country/KE/indicator/FP.CPI.TOTL.ZG | params={'format': 'json', 'per_page': 10, 'mrv': 5}
+[2026-04-09T03:53:02.135+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:53:02.135140+00:00", "level": "INFO", "module": "ingestion.base_client", "message": "Response 200 from https://api.worldbank.org/v2/country/KE/indicator/FP.CPI.TOTL.ZG"}
+[2026-04-09T03:53:02.135+0000] {base_client.py:20} INFO - Response 200 from https://api.worldbank.org/v2/country/KE/indicator/FP.CPI.TOTL.ZG
+[2026-04-09T03:53:02.139+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:53:02.139244+00:00", "level": "INFO", "module": "utils.validators", "message": "[worldbank/inflation] Validation passed for fields: ['metadata', 'data']"}
+[2026-04-09T03:53:02.139+0000] {validators.py:21} INFO - [worldbank/inflation] Validation passed for fields: ['metadata', 'data']
+[2026-04-09T03:53:02.143+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-09T03:53:02.143214+00:00", "level": "INFO", "module": "ingestion.worldbank", "message": "Saved inflation data to data/raw/worldbank/inflation_ke_20260409.json"}
+[2026-04-09T03:53:02.143+0000] {worldbank.py:42} INFO - Saved inflation data to data/raw/worldbank/inflation_ke_20260409.json
+[2026-04-09T03:53:02.144+0000] {python.py:201} INFO - Done. Returned value was: None
+[2026-04-09T03:53:02.271+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=kenya_econ_pipeline, task_id=worldbank_ingest, execution_date=20260408T030000, start_date=20260409T031647, end_date=20260409T035302
+[2026-04-09T03:53:02.362+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2026-04-09T03:53:02.473+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

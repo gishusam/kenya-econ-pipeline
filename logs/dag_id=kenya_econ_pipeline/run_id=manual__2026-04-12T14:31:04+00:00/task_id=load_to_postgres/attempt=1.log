@@ -1,0 +1,205 @@
+[2026-04-12T14:31:09.467+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: kenya_econ_pipeline.load_to_postgres manual__2026-04-12T14:31:04+00:00 [queued]>
+[2026-04-12T14:31:09.473+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: kenya_econ_pipeline.load_to_postgres manual__2026-04-12T14:31:04+00:00 [queued]>
+[2026-04-12T14:31:09.473+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 4
+[2026-04-12T14:31:09.480+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): load_to_postgres> on 2026-04-12 14:31:04+00:00
+[2026-04-12T14:31:09.484+0000] {standard_task_runner.py:60} INFO - Started process 18490 to run task
+[2026-04-12T14:31:09.488+0000] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'kenya_econ_pipeline', 'load_to_postgres', 'manual__2026-04-12T14:31:04+00:00', '--job-id', '82', '--raw', '--subdir', 'DAGS_FOLDER/kenya_econ_dag.py', '--cfg-path', '/tmp/tmpxstiahwx']
+[2026-04-12T14:31:09.494+0000] {standard_task_runner.py:88} INFO - Job 82: Subtask load_to_postgres
+[2026-04-12T14:31:09.532+0000] {task_command.py:423} INFO - Running <TaskInstance: kenya_econ_pipeline.load_to_postgres manual__2026-04-12T14:31:04+00:00 [running]> on host 2f11af39ed07
+[2026-04-12T14:31:09.623+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='samwel' AIRFLOW_CTX_DAG_ID='kenya_econ_pipeline' AIRFLOW_CTX_TASK_ID='load_to_postgres' AIRFLOW_CTX_EXECUTION_DATE='2026-04-12T14:31:04+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-04-12T14:31:04+00:00'
+[2026-04-12T14:31:09.655+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.655028+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.654+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.655+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.655500+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260402.json"}
+[2026-04-12T14:31:09.655+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260402.json
+[2026-04-12T14:31:09.660+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.660473+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.660+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.661+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.661629+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260408.json"}
+[2026-04-12T14:31:09.661+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260408.json
+[2026-04-12T14:31:09.676+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.676315+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.676+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.677+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.677053+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260409.json"}
+[2026-04-12T14:31:09.677+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260409.json
+[2026-04-12T14:31:09.684+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.684018+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.683+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.684+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.684515+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260410.json"}
+[2026-04-12T14:31:09.684+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260410.json
+[2026-04-12T14:31:09.690+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.690321+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.690+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.690+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.690850+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260411.json"}
+[2026-04-12T14:31:09.690+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260411.json
+[2026-04-12T14:31:09.700+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.700048+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.700+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.700+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.700507+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260412.json"}
+[2026-04-12T14:31:09.700+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260412.json
+[2026-04-12T14:31:09.709+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.709715+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.709+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.710+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.710378+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260402.json"}
+[2026-04-12T14:31:09.710+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260402.json
+[2026-04-12T14:31:09.717+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.716930+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.716+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.717+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.717643+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260408.json"}
+[2026-04-12T14:31:09.717+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260408.json
+[2026-04-12T14:31:09.729+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.729782+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.729+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.731+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.730942+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260409.json"}
+[2026-04-12T14:31:09.730+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260409.json
+[2026-04-12T14:31:09.745+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.745271+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.745+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.745+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.745886+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260410.json"}
+[2026-04-12T14:31:09.745+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260410.json
+[2026-04-12T14:31:09.755+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.755470+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.755+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.756+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.756161+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260411.json"}
+[2026-04-12T14:31:09.756+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260411.json
+[2026-04-12T14:31:09.767+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.767473+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.767+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.768+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.768813+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260412.json"}
+[2026-04-12T14:31:09.768+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260412.json
+[2026-04-12T14:31:09.784+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.784319+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Staging GDP load complete (SCD2 dedup applied)"}
+[2026-04-12T14:31:09.784+0000] {worldbank_loader.py:63} INFO - Staging GDP load complete (SCD2 dedup applied)
+[2026-04-12T14:31:09.785+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.785745+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.785+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.798+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.797930+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Staging inflation load complete"}
+[2026-04-12T14:31:09.797+0000] {worldbank_loader.py:86} INFO - Staging inflation load complete
+[2026-04-12T14:31:09.800+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.800459+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.800+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.822+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.822464+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.822+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.823+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.823198+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260402_152933.json"}
+[2026-04-12T14:31:09.823+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260402_152933.json
+[2026-04-12T14:31:09.830+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.830756+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.830+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.831+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.831159+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 130.09 KES | 1 KES = 0.00768699 USD | ts=2026-04-02 15:00:00+00:00"}
+[2026-04-12T14:31:09.831+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 130.09 KES | 1 KES = 0.00768699 USD | ts=2026-04-02 15:00:00+00:00
+[2026-04-12T14:31:09.838+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.838537+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.838+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.839+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.839725+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260402_190438.json"}
+[2026-04-12T14:31:09.839+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260402_190438.json
+[2026-04-12T14:31:09.846+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.846189+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.846+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.849+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.849560+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 130.1 KES | 1 KES = 0.0076864 USD | ts=2026-04-02 19:00:00+00:00"}
+[2026-04-12T14:31:09.849+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 130.1 KES | 1 KES = 0.0076864 USD | ts=2026-04-02 19:00:00+00:00
+[2026-04-12T14:31:09.856+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.856136+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.856+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.861+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.861870+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260402_190447.json"}
+[2026-04-12T14:31:09.861+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260402_190447.json
+[2026-04-12T14:31:09.870+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.870862+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.870+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.871+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.871495+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 130.1 KES | 1 KES = 0.0076864 USD | ts=2026-04-02 19:00:00+00:00"}
+[2026-04-12T14:31:09.871+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 130.1 KES | 1 KES = 0.0076864 USD | ts=2026-04-02 19:00:00+00:00
+[2026-04-12T14:31:09.878+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.878510+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.878+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.880+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.880305+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260402_195641.json"}
+[2026-04-12T14:31:09.880+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260402_195641.json
+[2026-04-12T14:31:09.890+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.890381+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.890+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.891+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.891013+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 130.1 KES | 1 KES = 0.0076864 USD | ts=2026-04-02 19:00:00+00:00"}
+[2026-04-12T14:31:09.891+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 130.1 KES | 1 KES = 0.0076864 USD | ts=2026-04-02 19:00:00+00:00
+[2026-04-12T14:31:09.897+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.897835+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.897+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.898+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.898402+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260408_115811.json"}
+[2026-04-12T14:31:09.898+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260408_115811.json
+[2026-04-12T14:31:09.904+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.904823+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.904+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.907+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.907652+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.35 KES | 1 KES = 0.00773096 USD | ts=2026-04-08 11:00:00+00:00"}
+[2026-04-12T14:31:09.907+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.35 KES | 1 KES = 0.00773096 USD | ts=2026-04-08 11:00:00+00:00
+[2026-04-12T14:31:09.917+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.917501+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.917+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.918+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.918055+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260409_035300.json"}
+[2026-04-12T14:31:09.918+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260409_035300.json
+[2026-04-12T14:31:09.924+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.924266+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.924+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.924+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.924692+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.4 KES | 1 KES = 0.00772798 USD | ts=2026-04-09 03:00:00+00:00"}
+[2026-04-12T14:31:09.924+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.4 KES | 1 KES = 0.00772798 USD | ts=2026-04-09 03:00:00+00:00
+[2026-04-12T14:31:09.938+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.938286+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.938+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.939+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.939491+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260410_030519.json"}
+[2026-04-12T14:31:09.939+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260410_030519.json
+[2026-04-12T14:31:09.948+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.948046+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.947+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.950+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.950265+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.25 KES | 1 KES = 0.00773694 USD | ts=2026-04-10 03:00:00+00:00"}
+[2026-04-12T14:31:09.950+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.25 KES | 1 KES = 0.00773694 USD | ts=2026-04-10 03:00:00+00:00
+[2026-04-12T14:31:09.959+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.959917+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.959+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.960+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.960395+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260411_030917.json"}
+[2026-04-12T14:31:09.960+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260411_030917.json
+[2026-04-12T14:31:09.965+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.965760+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.965+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.966+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.966371+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-11 03:00:04+00:00"}
+[2026-04-12T14:31:09.966+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-11 03:00:04+00:00
+[2026-04-12T14:31:09.971+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.971694+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.971+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.972+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.972166+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260412_030003.json"}
+[2026-04-12T14:31:09.972+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260412_030003.json
+[2026-04-12T14:31:09.976+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.976346+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.976+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.976+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.976697+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 02:00:19+00:00"}
+[2026-04-12T14:31:09.976+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 02:00:19+00:00
+[2026-04-12T14:31:09.983+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.983238+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:09.983+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:09.983+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:09.983761+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260412_135055.json"}
+[2026-04-12T14:31:09.983+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260412_135055.json
+[2026-04-12T14:31:10.029+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.029003+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.028+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.033+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.033213+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 13:00:20+00:00"}
+[2026-04-12T14:31:10.033+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 13:00:20+00:00
+[2026-04-12T14:31:10.044+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.044591+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.044+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.045+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.045035+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260412_135112.json"}
+[2026-04-12T14:31:10.045+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260412_135112.json
+[2026-04-12T14:31:10.052+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.052614+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.052+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.053+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.053706+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 13:00:20+00:00"}
+[2026-04-12T14:31:10.053+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 13:00:20+00:00
+[2026-04-12T14:31:10.063+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.063694+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.063+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.064+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.064544+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260412_135321.json"}
+[2026-04-12T14:31:10.064+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260412_135321.json
+[2026-04-12T14:31:10.074+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.073972+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.073+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.074+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.074337+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 13:00:20+00:00"}
+[2026-04-12T14:31:10.074+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 13:00:20+00:00
+[2026-04-12T14:31:10.079+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.079129+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.079+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.081+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.081071+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260412_142141.json"}
+[2026-04-12T14:31:10.081+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260412_142141.json
+[2026-04-12T14:31:10.093+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.093418+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.093+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.094+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.094173+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 14:00:15+00:00"}
+[2026-04-12T14:31:10.094+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 14:00:15+00:00
+[2026-04-12T14:31:10.099+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.099634+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.099+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.100+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.100005+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260412_142205.json"}
+[2026-04-12T14:31:10.099+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260412_142205.json
+[2026-04-12T14:31:10.104+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.104328+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.104+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.104+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.104720+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 14:00:15+00:00"}
+[2026-04-12T14:31:10.104+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 14:00:15+00:00
+[2026-04-12T14:31:10.108+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.108948+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.108+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.109+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.109284+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260412_143048.json"}
+[2026-04-12T14:31:10.109+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260412_143048.json
+[2026-04-12T14:31:10.114+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.114855+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.114+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.115+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.115188+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 14:00:15+00:00"}
+[2026-04-12T14:31:10.115+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 14:00:15+00:00
+[2026-04-12T14:31:10.118+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.118961+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.118+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.119+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.119228+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260412_143049.json"}
+[2026-04-12T14:31:10.119+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260412_143049.json
+[2026-04-12T14:31:10.123+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.123202+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.123+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.123+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.123570+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 14:00:15+00:00"}
+[2026-04-12T14:31:10.123+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 14:00:15+00:00
+[2026-04-12T14:31:10.130+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.130561+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.130+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.131+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.131063+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Loaded 3 FX pairs from fx_ke_20260412_143108.json"}
+[2026-04-12T14:31:10.131+0000] {fx_loader.py:28} INFO - Loaded 3 FX pairs from fx_ke_20260412_143108.json
+[2026-04-12T14:31:10.135+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.135648+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:31:10.135+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:31:10.135+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:31:10.135949+00:00", "level": "INFO", "module": "db.loaders.fx_loader", "message": "Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 14:00:15+00:00"}
+[2026-04-12T14:31:10.135+0000] {fx_loader.py:55} INFO - Staged FX: 1 USD = 129.210149 KES | 1 KES = 0.00773933 USD | ts=2026-04-12 14:00:15+00:00
+[2026-04-12T14:31:10.136+0000] {python.py:201} INFO - Done. Returned value was: None
+[2026-04-12T14:31:10.149+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=kenya_econ_pipeline, task_id=load_to_postgres, execution_date=20260412T143104, start_date=20260412T143109, end_date=20260412T143110
+[2026-04-12T14:31:10.171+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2026-04-12T14:31:10.218+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

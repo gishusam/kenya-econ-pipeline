@@ -1,0 +1,12 @@
+kenya_econ_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      port: 5432
+      dbname: kenya_econ
+      user: kenya_user
+      password: kenya_pass
+      schema: mart
+      threads: 4

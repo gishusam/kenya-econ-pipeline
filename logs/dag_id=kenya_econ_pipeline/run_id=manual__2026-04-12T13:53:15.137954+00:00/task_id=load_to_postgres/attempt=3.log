@@ -1,0 +1,84 @@
+[2026-04-12T14:03:24.284+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: kenya_econ_pipeline.load_to_postgres manual__2026-04-12T13:53:15.137954+00:00 [queued]>
+[2026-04-12T14:03:24.291+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: kenya_econ_pipeline.load_to_postgres manual__2026-04-12T13:53:15.137954+00:00 [queued]>
+[2026-04-12T14:03:24.291+0000] {taskinstance.py:2170} INFO - Starting attempt 3 of 4
+[2026-04-12T14:03:24.299+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): load_to_postgres> on 2026-04-12 13:53:15.137954+00:00
+[2026-04-12T14:03:24.308+0000] {standard_task_runner.py:60} INFO - Started process 18058 to run task
+[2026-04-12T14:03:24.311+0000] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'kenya_econ_pipeline', 'load_to_postgres', 'manual__2026-04-12T13:53:15.137954+00:00', '--job-id', '49', '--raw', '--subdir', 'DAGS_FOLDER/kenya_econ_dag.py', '--cfg-path', '/tmp/tmp2adhzzpg']
+[2026-04-12T14:03:24.313+0000] {standard_task_runner.py:88} INFO - Job 49: Subtask load_to_postgres
+[2026-04-12T14:03:24.361+0000] {task_command.py:423} INFO - Running <TaskInstance: kenya_econ_pipeline.load_to_postgres manual__2026-04-12T13:53:15.137954+00:00 [running]> on host 2f11af39ed07
+[2026-04-12T14:03:24.434+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='samwel' AIRFLOW_CTX_DAG_ID='kenya_econ_pipeline' AIRFLOW_CTX_TASK_ID='load_to_postgres' AIRFLOW_CTX_EXECUTION_DATE='2026-04-12T13:53:15.137954+00:00' AIRFLOW_CTX_TRY_NUMBER='3' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-04-12T13:53:15.137954+00:00'
+[2026-04-12T14:03:24.470+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.470489+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.470+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.471+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.471243+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260402.json"}
+[2026-04-12T14:03:24.471+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260402.json
+[2026-04-12T14:03:24.477+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.477435+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.477+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.477+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.477836+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260408.json"}
+[2026-04-12T14:03:24.477+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260408.json
+[2026-04-12T14:03:24.484+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.484335+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.484+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.484+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.484616+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260409.json"}
+[2026-04-12T14:03:24.484+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260409.json
+[2026-04-12T14:03:24.488+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.488836+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.488+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.489+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.489114+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260410.json"}
+[2026-04-12T14:03:24.489+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260410.json
+[2026-04-12T14:03:24.494+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.494379+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.494+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.494+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.494660+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260411.json"}
+[2026-04-12T14:03:24.494+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260411.json
+[2026-04-12T14:03:24.500+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.500340+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.500+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.500+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.500601+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260412.json"}
+[2026-04-12T14:03:24.500+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_gdp from gdp_ke_20260412.json
+[2026-04-12T14:03:24.506+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.506563+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.506+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.506+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.506845+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260402.json"}
+[2026-04-12T14:03:24.506+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260402.json
+[2026-04-12T14:03:24.511+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.511297+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.511+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.511+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.511551+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260408.json"}
+[2026-04-12T14:03:24.511+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260408.json
+[2026-04-12T14:03:24.516+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.516620+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.516+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.516+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.516882+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260409.json"}
+[2026-04-12T14:03:24.516+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260409.json
+[2026-04-12T14:03:24.522+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.522108+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.522+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.522+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.522377+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260410.json"}
+[2026-04-12T14:03:24.522+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260410.json
+[2026-04-12T14:03:24.526+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.526792+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.526+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.527+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.527132+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260411.json"}
+[2026-04-12T14:03:24.527+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260411.json
+[2026-04-12T14:03:24.532+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.532104+00:00", "level": "INFO", "module": "db.connection", "message": "Transaction committed"}
+[2026-04-12T14:03:24.532+0000] {connection.py:26} INFO - Transaction committed
+[2026-04-12T14:03:24.532+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.532401+00:00", "level": "INFO", "module": "db.loaders.worldbank_loader", "message": "Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260412.json"}
+[2026-04-12T14:03:24.532+0000] {worldbank_loader.py:38} INFO - Inserted 5 rows into raw.worldbank_inflation from inflation_ke_20260412.json
+[2026-04-12T14:03:24.539+0000] {logging_mixin.py:188} INFO - {"timestamp": "2026-04-12T14:03:24.539342+00:00", "level": "ERROR", "module": "db.connection", "message": "Transaction rolled back: duplicate key value violates unique constraint \"stg_worldbank_gdp_country_code_indicator_id_year_valid_from_key\"\nDETAIL:  Key (country_code, indicator_id, year, valid_from)=(KEN, NY.GDP.MKTP.CD, 2024, 2026-04-12 14:03:24.536213+00) already exists.\n"}
+[2026-04-12T14:03:24.539+0000] {connection.py:29} ERROR - Transaction rolled back: duplicate key value violates unique constraint "stg_worldbank_gdp_country_code_indicator_id_year_valid_from_key"
+DETAIL:  Key (country_code, indicator_id, year, valid_from)=(KEN, NY.GDP.MKTP.CD, 2024, 2026-04-12 14:03:24.536213+00) already exists.
+
+[2026-04-12T14:03:24.539+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/kenya_econ_dag.py", line 37, in run_loaders
+    run_worldbank()
+  File "/opt/airflow/db/loaders/worldbank_loader.py", line 94, in run
+    load_to_staging_gdp()
+  File "/opt/airflow/db/loaders/worldbank_loader.py", line 43, in load_to_staging_gdp
+    cur.execute("""
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "stg_worldbank_gdp_country_code_indicator_id_year_valid_from_key"
+DETAIL:  Key (country_code, indicator_id, year, valid_from)=(KEN, NY.GDP.MKTP.CD, 2024, 2026-04-12 14:03:24.536213+00) already exists.
+
+[2026-04-12T14:03:24.548+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=kenya_econ_pipeline, task_id=load_to_postgres, execution_date=20260412T135315, start_date=20260412T140324, end_date=20260412T140324
+[2026-04-12T14:03:24.554+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 49 for task load_to_postgres (duplicate key value violates unique constraint "stg_worldbank_gdp_country_code_indicator_id_year_valid_from_key"
+DETAIL:  Key (country_code, indicator_id, year, valid_from)=(KEN, NY.GDP.MKTP.CD, 2024, 2026-04-12 14:03:24.536213+00) already exists.
+; 18058)
+[2026-04-12T14:03:24.581+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2026-04-12T14:03:24.599+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

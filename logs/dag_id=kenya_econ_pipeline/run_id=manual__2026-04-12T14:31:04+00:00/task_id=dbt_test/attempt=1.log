@@ -1,0 +1,60 @@
+[2026-04-12T14:36:21.200+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: kenya_econ_pipeline.dbt_test manual__2026-04-12T14:31:04+00:00 [queued]>
+[2026-04-12T14:36:21.211+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: kenya_econ_pipeline.dbt_test manual__2026-04-12T14:31:04+00:00 [queued]>
+[2026-04-12T14:36:21.211+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 4
+[2026-04-12T14:36:21.221+0000] {taskinstance.py:2191} INFO - Executing <Task(BashOperator): dbt_test> on 2026-04-12 14:31:04+00:00
+[2026-04-12T14:36:21.225+0000] {standard_task_runner.py:60} INFO - Started process 18606 to run task
+[2026-04-12T14:36:21.236+0000] {standard_task_runner.py:87} INFO - Running: ['airflow', 'tasks', 'run', 'kenya_econ_pipeline', 'dbt_test', 'manual__2026-04-12T14:31:04+00:00', '--job-id', '87', '--raw', '--subdir', 'DAGS_FOLDER/kenya_econ_dag.py', '--cfg-path', '/tmp/tmp_w4cd6u0']
+[2026-04-12T14:36:21.238+0000] {standard_task_runner.py:88} INFO - Job 87: Subtask dbt_test
+[2026-04-12T14:36:21.318+0000] {task_command.py:423} INFO - Running <TaskInstance: kenya_econ_pipeline.dbt_test manual__2026-04-12T14:31:04+00:00 [running]> on host 2f11af39ed07
+[2026-04-12T14:36:21.384+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='samwel' AIRFLOW_CTX_DAG_ID='kenya_econ_pipeline' AIRFLOW_CTX_TASK_ID='dbt_test' AIRFLOW_CTX_EXECUTION_DATE='2026-04-12T14:31:04+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-04-12T14:31:04+00:00'
+[2026-04-12T14:36:21.385+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2026-04-12T14:36:21.386+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'cd /opt/airflow/kenya_econ_dbt && dbt test --profiles-dir /opt/airflow/kenya_econ_dbt']
+[2026-04-12T14:36:21.398+0000] {subprocess.py:86} INFO - Output:
+[2026-04-12T14:36:23.375+0000] {subprocess.py:93} INFO - [0m14:36:23  Running with dbt=1.7.0
+[2026-04-12T14:36:23.625+0000] {subprocess.py:93} INFO - [0m14:36:23  Registered adapter: postgres=1.7.0
+[2026-04-12T14:36:23.766+0000] {subprocess.py:93} INFO - [0m14:36:23  [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+[2026-04-12T14:36:23.767+0000] {subprocess.py:93} INFO - There are 2 unused configuration paths:
+[2026-04-12T14:36:23.768+0000] {subprocess.py:93} INFO - - models.staging
+[2026-04-12T14:36:23.772+0000] {subprocess.py:93} INFO - - models.mart
+[2026-04-12T14:36:23.808+0000] {subprocess.py:93} INFO - [0m14:36:23  Found 6 models, 14 tests, 3 sources, 0 exposures, 0 metrics, 402 macros, 0 groups, 0 semantic models
+[2026-04-12T14:36:23.812+0000] {subprocess.py:93} INFO - [0m14:36:23
+[2026-04-12T14:36:23.919+0000] {subprocess.py:93} INFO - [0m14:36:23  Concurrency: 4 threads (target='dev')
+[2026-04-12T14:36:23.920+0000] {subprocess.py:93} INFO - [0m14:36:23
+[2026-04-12T14:36:23.929+0000] {subprocess.py:93} INFO - [0m14:36:23  1 of 14 START test not_null_fx_daily_summary_rate_avg .......................... [RUN]
+[2026-04-12T14:36:23.930+0000] {subprocess.py:93} INFO - [0m14:36:23  2 of 14 START test not_null_fx_daily_summary_rate_date ......................... [RUN]
+[2026-04-12T14:36:23.931+0000] {subprocess.py:93} INFO - [0m14:36:23  3 of 14 START test not_null_kenya_macro_gdp_kes_billions ....................... [RUN]
+[2026-04-12T14:36:23.932+0000] {subprocess.py:93} INFO - [0m14:36:23  4 of 14 START test not_null_kenya_macro_gdp_usd_billions ....................... [RUN]
+[2026-04-12T14:36:24.008+0000] {subprocess.py:93} INFO - [0m14:36:24  1 of 14 PASS not_null_fx_daily_summary_rate_avg ................................ [[32mPASS[0m in 0.08s]
+[2026-04-12T14:36:24.009+0000] {subprocess.py:93} INFO - [0m14:36:24  2 of 14 PASS not_null_fx_daily_summary_rate_date ............................... [[32mPASS[0m in 0.08s]
+[2026-04-12T14:36:24.014+0000] {subprocess.py:93} INFO - [0m14:36:24  5 of 14 START test not_null_kenya_macro_year ................................... [RUN]
+[2026-04-12T14:36:24.015+0000] {subprocess.py:93} INFO - [0m14:36:24  6 of 14 START test not_null_purchasing_power_purchasing_power_index ............ [RUN]
+[2026-04-12T14:36:24.018+0000] {subprocess.py:93} INFO - [0m14:36:24  3 of 14 PASS not_null_kenya_macro_gdp_kes_billions ............................. [[32mPASS[0m in 0.09s]
+[2026-04-12T14:36:24.019+0000] {subprocess.py:93} INFO - [0m14:36:24  4 of 14 PASS not_null_kenya_macro_gdp_usd_billions ............................. [[32mPASS[0m in 0.09s]
+[2026-04-12T14:36:24.028+0000] {subprocess.py:93} INFO - [0m14:36:24  7 of 14 START test not_null_purchasing_power_year .............................. [RUN]
+[2026-04-12T14:36:24.028+0000] {subprocess.py:93} INFO - [0m14:36:24  8 of 14 START test not_null_stg_fx_kes_per_usd ................................. [RUN]
+[2026-04-12T14:36:24.069+0000] {subprocess.py:93} INFO - [0m14:36:24  6 of 14 PASS not_null_purchasing_power_purchasing_power_index .................. [[32mPASS[0m in 0.05s]
+[2026-04-12T14:36:24.070+0000] {subprocess.py:93} INFO - [0m14:36:24  5 of 14 PASS not_null_kenya_macro_year ......................................... [[32mPASS[0m in 0.05s]
+[2026-04-12T14:36:24.074+0000] {subprocess.py:93} INFO - [0m14:36:24  9 of 14 START test not_null_stg_fx_rate_timestamp .............................. [RUN]
+[2026-04-12T14:36:24.075+0000] {subprocess.py:93} INFO - [0m14:36:24  10 of 14 START test not_null_stg_gdp_value_usd ................................. [RUN]
+[2026-04-12T14:36:24.080+0000] {subprocess.py:93} INFO - [0m14:36:24  7 of 14 PASS not_null_purchasing_power_year .................................... [[32mPASS[0m in 0.05s]
+[2026-04-12T14:36:24.088+0000] {subprocess.py:93} INFO - [0m14:36:24  8 of 14 PASS not_null_stg_fx_kes_per_usd ....................................... [[32mPASS[0m in 0.06s]
+[2026-04-12T14:36:24.089+0000] {subprocess.py:93} INFO - [0m14:36:24  11 of 14 START test not_null_stg_gdp_year ...................................... [RUN]
+[2026-04-12T14:36:24.096+0000] {subprocess.py:93} INFO - [0m14:36:24  12 of 14 START test not_null_stg_inflation_inflation_pct ....................... [RUN]
+[2026-04-12T14:36:24.133+0000] {subprocess.py:93} INFO - [0m14:36:24  9 of 14 PASS not_null_stg_fx_rate_timestamp .................................... [[32mPASS[0m in 0.06s]
+[2026-04-12T14:36:24.137+0000] {subprocess.py:93} INFO - [0m14:36:24  10 of 14 PASS not_null_stg_gdp_value_usd ....................................... [[32mPASS[0m in 0.06s]
+[2026-04-12T14:36:24.140+0000] {subprocess.py:93} INFO - [0m14:36:24  13 of 14 START test not_null_stg_inflation_year ................................ [RUN]
+[2026-04-12T14:36:24.155+0000] {subprocess.py:93} INFO - [0m14:36:24  14 of 14 START test unique_fx_daily_summary_rate_date .......................... [RUN]
+[2026-04-12T14:36:24.204+0000] {subprocess.py:93} INFO - [0m14:36:24  12 of 14 PASS not_null_stg_inflation_inflation_pct ............................. [[32mPASS[0m in 0.10s]
+[2026-04-12T14:36:24.207+0000] {subprocess.py:93} INFO - [0m14:36:24  11 of 14 PASS not_null_stg_gdp_year ............................................ [[32mPASS[0m in 0.12s]
+[2026-04-12T14:36:24.221+0000] {subprocess.py:93} INFO - [0m14:36:24  13 of 14 PASS not_null_stg_inflation_year ...................................... [[32mPASS[0m in 0.08s]
+[2026-04-12T14:36:24.222+0000] {subprocess.py:93} INFO - [0m14:36:24  14 of 14 PASS unique_fx_daily_summary_rate_date ................................ [[32mPASS[0m in 0.05s]
+[2026-04-12T14:36:24.234+0000] {subprocess.py:93} INFO - [0m14:36:24
+[2026-04-12T14:36:24.235+0000] {subprocess.py:93} INFO - [0m14:36:24  Finished running 14 tests in 0 hours 0 minutes and 0.42 seconds (0.42s).
+[2026-04-12T14:36:24.246+0000] {subprocess.py:93} INFO - [0m14:36:24
+[2026-04-12T14:36:24.246+0000] {subprocess.py:93} INFO - [0m14:36:24  [32mCompleted successfully[0m
+[2026-04-12T14:36:24.247+0000] {subprocess.py:93} INFO - [0m14:36:24
+[2026-04-12T14:36:24.247+0000] {subprocess.py:93} INFO - [0m14:36:24  Done. PASS=14 WARN=0 ERROR=0 SKIP=0 TOTAL=14
+[2026-04-12T14:36:26.563+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2026-04-12T14:36:26.621+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=kenya_econ_pipeline, task_id=dbt_test, execution_date=20260412T143104, start_date=20260412T143621, end_date=20260412T143626
+[2026-04-12T14:36:26.671+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2026-04-12T14:36:26.686+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
