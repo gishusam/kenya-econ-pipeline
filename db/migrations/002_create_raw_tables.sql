@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS raw.worldbank_gdp (
     year            VARCHAR(4),
     value           NUMERIC,
     source_file     TEXT,
-    loaded_at       TIMESTAMPTZ DEFAULT NOW()
+    loaded_at       TIMESTAMPTZ DEFAULT NOW(),
+
+    UNIQUE (country_code,indicator_id,year)
 );
 
 CREATE TABLE IF NOT EXISTS raw.worldbank_inflation (
@@ -19,7 +21,12 @@ CREATE TABLE IF NOT EXISTS raw.worldbank_inflation (
     year            VARCHAR(4),
     value           NUMERIC,
     source_file     TEXT,
-    loaded_at       TIMESTAMPTZ DEFAULT NOW()
+    loaded_at       TIMESTAMPTZ DEFAULT NOW(),
+
+    UNIQUE (country_code, indicator_id, year)
+    
+
+
 );
 
 CREATE TABLE IF NOT EXISTS raw.fx_rates (

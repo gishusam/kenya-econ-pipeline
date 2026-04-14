@@ -24,7 +24,7 @@ def load_worldbank_file(filepath: str, table: str, value_col: str):
                     (country_code, country_name, indicator_id,
                      indicator_name, year, value, source_file)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (country_code, indicator_id, year, source_file)
+                ON CONFLICT (country_code, indicator_id, year)
                 DO NOTHING 
             """, (
                 record["countryiso3code"],
