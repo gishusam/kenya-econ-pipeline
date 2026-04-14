@@ -111,6 +111,28 @@ services:
       bash -c "pip install psycopg2-binary dbt-postgres==1.7.0 tenacity python-dotenv kafka-python -q &&
                airflow scheduler"
     restart: always
+  
+  dashboard:
+    image: python:3.13-slim
+    container_name: kenya_dashboard
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "8501:8501"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=kenya_econ
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      bash -c "pip install streamlit plotly pandas psycopg2-binary python-dotenv -q &&
+               streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0"
+    restart: always
 
 volumes:
   postgres_data:

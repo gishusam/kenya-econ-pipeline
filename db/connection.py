@@ -14,6 +14,7 @@ def get_connection():
         dbname=os.getenv("POSTGRES_DB", "kenya_econ"),
         user=os.getenv("POSTGRES_USER"),
         password=os.getenv("POSTGRES_PASSWORD"),
+        options="-c statement_timeout=30000 -c idle_in_transaction_session_timeout=10000"
     )
 
 @contextmanager

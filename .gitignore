@@ -4,3 +4,23 @@ __pycache__/
 *.pyc
 .pytest_cache/
 postgres_data/
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Airflow logs
+logs/
+
+# OS
+.DS_Store
+
+# Env files
+.env
+
+# dbt
+target/
+dbt_packages/
+
+# IDE
+.vscode/
