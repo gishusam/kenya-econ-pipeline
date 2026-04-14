@@ -15,9 +15,10 @@ target-path: "target"
 clean-targets: ["target", "dbt_packages"]
 
 models:
-  staging:
-    +schema: staging
-    +materialized: view
-  mart:
-    +schema: mart
-    +materialized: table
+  kenya_econ_dbt:
+    staging:
+      +schema: staging
+      +materialized: view
+    mart:
+      +schema: mart
+      +materialized: table
