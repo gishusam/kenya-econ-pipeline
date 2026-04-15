@@ -1,4 +1,25 @@
+# Ingestion
+requests==2.31.0
+tenacity==8.2.3
+python-dotenv==1.0.0
+
+# Database
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.0
+
+# Transformation
+dbt-postgres==1.7.0
+
+# Orchestration
+apache-airflow==2.8.1
+
+# Streaming
+kafka-python==2.0.2
+
+# Dashboard
 streamlit==1.32.0
-pandas>=2.2.2
 plotly==5.20.0
-psycopg[binary]>=3.1.18
+pandas==2.2.0
+
+# Testing
+pytest==7.4.0
