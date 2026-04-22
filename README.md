@@ -10,6 +10,11 @@ A production-grade, end-to-end data engineering project that ingests, transforms
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://postgresql.org)
 
 ---
+## Dashboard Preview
+
+![Kenya Economic Intelligence Dashboard](assets/dashboard-preview.png)
+
+---
 
 ## Problem Statement
 
@@ -318,12 +323,14 @@ The purchasing power index — a metric this pipeline derives that no single dat
 
 ## Author
 
-**Samwel Ngugi** — Data Engineer, Nairobi, Kenya
+**Samwel Ngugi** — Junior Data Engineer, Nairobi, Kenya  
+Open to remote data engineering roles.
 
-Building data pipelines that solve real problems in African markets.
+Specialising in production pipelines on the modern data stack:  
+Python · Airflow · dbt · Kafka · BigQuery · GCP · Docker
 
-[GitHub](https://github.com/gishusam) · [LinkedIn](https://www.linkedin.com/in/samwelngugi/)
-
----
-
+[GitHub](https://github.com/samwelngugi) · 
+[LinkedIn](https://linkedin.com/in/samwelngugi) · 
+[Live Dashboard](https://kenya-economic-intelligence.streamlit.app) · 
+📩 sammiegichu@gmail.com
 
