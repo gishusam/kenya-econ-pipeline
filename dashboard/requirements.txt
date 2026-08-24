@@ -1,6 +1,6 @@
-streamlit
-pandas
-plotly
-sqlalchemy
-psycopg2-binary
-python-dotenv
+streamlit==1.61.1
+pandas==3.0.5
+plotly==6.9.0
+google-cloud-bigquery==3.43.0
+google-auth==2.56.3
+db-dtypes==1.7.1

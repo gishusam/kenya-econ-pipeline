@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: raw
+    database: "{{ env_var('GCP_PROJECT_ID', 'kenya-econ-dev') }}"
+    schema: raw
+    tables:
+      - name: economic_observations
+        columns:
+          - name: source_record_hash
+            tests: [not_null, unique]
+          - name: source
+            tests: [not_null]
+          - name: indicator_code
+            tests: [not_null]
+          - name: period_start
+            tests: [not_null]
+          - name: period_end
+            tests: [not_null]
+          - name: value
+            tests: [not_null]
+          - name: run_id
+            tests: [not_null]
+
+  - name: metadata
+    database: "{{ env_var('GCP_PROJECT_ID', 'kenya-econ-dev') }}"
+    schema: metadata
+    tables:
+      - name: pipeline_runs
+      - name: source_runs

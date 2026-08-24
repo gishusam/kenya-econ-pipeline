@@ -1,16 +1,11 @@
 name: kenya_econ_dbt
-version: "1.0.0"
+version: "2.0.0"
 config-version: 2
 
 profile: kenya_econ_dbt
-
 model-paths: ["models"]
-test-paths: ["tests"]
-analysis-paths: ["analyses"]
 macro-paths: ["macros"]
-seed-paths: ["seeds"]
-snapshot-paths: ["snapshots"]
-
+test-paths: ["tests"]
 target-path: "target"
 clean-targets: ["target", "dbt_packages"]
 
@@ -19,6 +14,6 @@ models:
     staging:
       +schema: staging
       +materialized: view
-    mart:
-      +schema: mart
+    marts:
+      +schema: marts
       +materialized: table

@@ -1,0 +1,7 @@
+[
+  {"page": 1, "pages": 1, "per_page": 2, "total": 2},
+  [
+    {"indicator": {"id": "NY.GDP.MKTP.KD.ZG", "value": "GDP growth (annual %)"}, "country": {"id": "KE", "value": "Kenya"}, "countryiso3code": "KEN", "date": "2025", "value": 4.7},
+    {"indicator": {"id": "NY.GDP.MKTP.KD.ZG", "value": "GDP growth (annual %)"}, "country": {"id": "KE", "value": "Kenya"}, "countryiso3code": "KEN", "date": "2024", "value": 4.5}
+  ]
+]

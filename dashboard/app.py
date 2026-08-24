@@ -1,282 +1,131 @@
-import streamlit as st
+from __future__ import annotations
+
+import os
+
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
-import os
-from sqlalchemy import create_engine
-from dotenv import load_dotenv
+import streamlit as st
 
-load_dotenv()
+from dashboard.data import build_bigquery_client, indicator_value, query_dataframe, status_icon
 
-st.set_page_config(
-    page_title="Kenya Economic Intelligence",
-    page_icon="🇰🇪",
-    layout="wide",
-)
+st.set_page_config(page_title="Kenya Economic Intelligence", page_icon="🇰🇪", layout="wide")
 
-def get_engine():
-    user = os.getenv("POSTGRES_USER")
-    password = os.getenv("POSTGRES_PASSWORD")
-    host = os.getenv("POSTGRES_HOST", "localhost")
-    port = os.getenv("POSTGRES_PORT", 5432)
-    db = os.getenv("POSTGRES_DB", "kenya_econ")
-    return create_engine(
-        f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}",
-        pool_pre_ping=True,
-        pool_recycle=300,
-        connect_args={"connect_timeout": 10},
-    )
 
-@st.cache_data(ttl=300)
-def load_macro():
-    with get_engine().connect() as conn:
-        return pd.read_sql("""
-            SELECT year, gdp_usd_billions, gdp_kes_billions,
-                   inflation_pct, gdp_growth_pct, kes_per_usd
-            FROM mart.kenya_macro
-            ORDER BY year DESC
-        """, conn)
+def _secret(name: str, default=None):
+    try:
+        return st.secrets.get(name, default)
+    except Exception:
+        return default
 
-@st.cache_data(ttl=60)
-def load_fx():
-    with get_engine().connect() as conn:
-        return pd.read_sql("""
-            SELECT rate_date, rate_min, rate_max,
-                   rate_avg, snapshot_count
-            FROM mart.fx_daily_summary
-            ORDER BY rate_date DESC
-            LIMIT 30
-        """, conn)
 
-@st.cache_data(ttl=60)
-def load_fx_live():
-    with get_engine().connect() as conn:
-        return pd.read_sql("""
-            SELECT rate_timestamp, rate, usd_per_kes
-            FROM staging.stg_fx_rates
-            ORDER BY rate_timestamp DESC
-            LIMIT 100
-        """, conn)
+@st.cache_resource
+def get_client():
+    project_id = _secret("GCP_PROJECT_ID") or os.getenv("GCP_PROJECT_ID")
+    if not project_id:
+        raise RuntimeError("Set GCP_PROJECT_ID in Streamlit secrets or the environment")
+    service_account_info = _secret("gcp_service_account")
+    if service_account_info:
+        service_account_info = dict(service_account_info)
+    return build_bigquery_client(project_id, service_account_info), project_id
+
 
 @st.cache_data(ttl=300)
-def load_purchasing_power():
-    with get_engine().connect() as conn:
-        return pd.read_sql("""
-            SELECT year, inflation_pct, kes_per_usd,
-                   inflation_index, fx_strength_index,
-                   purchasing_power_index
-            FROM mart.purchasing_power
-            ORDER BY year ASC
-        """, conn)
-
-# ── Header ──────────────────────────────────────────────
-st.title("🇰🇪 Kenya Economic Intelligence Dashboard")
-st.caption("Real-time pipeline · World Bank · Open Exchange Rates · Kafka stream")
-
-macro = load_macro()
-fx_live = load_fx_live()
-pp = load_purchasing_power()
-
-latest = macro.iloc[0]
-prev = macro.iloc[1] if len(macro) > 1 else None
-latest_fx = fx_live.iloc[0] if len(fx_live) > 0 else None
-
-# ── KPI Row ──────────────────────────────────────────────
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    gdp_delta = (
-        f"{latest['gdp_growth_pct']:+.1f}% YoY"
-        if pd.notna(latest["gdp_growth_pct"])
-        else "N/A"
+def load_dashboard_data():
+    client, project_id = get_client()
+    snapshot = query_dataframe(client, f"SELECT * FROM `{project_id}.marts.economic_snapshot`")
+    history = query_dataframe(
+        client,
+        f"SELECT * FROM `{project_id}.marts.indicator_history` ORDER BY period_end",
     )
-    st.metric("GDP (latest year)", f"${latest['gdp_usd_billions']:.1f}B", gdp_delta)
+    health = query_dataframe(client, f"SELECT * FROM `{project_id}.marts.source_health` ORDER BY source")
+    pipeline = query_dataframe(client, f"SELECT * FROM `{project_id}.marts.pipeline_status`")
+    return snapshot, history, health, pipeline
 
-with col2:
-    gdp_kes = latest["gdp_kes_billions"]
-    st.metric("GDP in KES", f"KES {gdp_kes:,.0f}B", "at current FX rate")
 
-with col3:
-    inf = latest["inflation_pct"]
-    inf_prev = prev["inflation_pct"] if prev is not None else None
-    inf_delta = (
-        f"{inf - inf_prev:+.2f}pp vs prior year"
-        if inf_prev is not None and pd.notna(inf_prev)
-        else ""
-    )
-    st.metric("Inflation rate", f"{inf:.2f}%", inf_delta)
+st.title("🇰🇪 Kenya Economic Intelligence")
+st.caption("Official-source economic data · revision-aware · autonomously refreshed")
 
-with col4:
-    if latest_fx is not None:
-        rate = float(latest_fx["rate"])
-        st.metric("KES / USD (live)", f"{rate:.2f}", "Kafka stream")
-    else:
-        st.metric("KES / USD", f"{latest['kes_per_usd']:.2f}", "batch")
+try:
+    snapshot, history, health, pipeline = load_dashboard_data()
+except Exception as exc:
+    st.error("The warehouse is not ready or the dashboard cannot reach BigQuery.")
+    st.exception(exc)
+    st.stop()
+
+usd_kes = indicator_value(snapshot, "USD_KES")
+inflation = indicator_value(snapshot, "CPI_INFLATION_YOY")
+gdp_growth = indicator_value(snapshot, "REAL_GDP_GROWTH")
+gdp_lcu = indicator_value(snapshot, "GDP_CURRENT_LCU")
+
+c1, c2, c3, c4 = st.columns(4)
+with c1:
+    st.metric("KES / USD", f"{usd_kes:.2f}" if usd_kes is not None else "—")
+with c2:
+    st.metric("Headline inflation", f"{inflation:.1f}%" if inflation is not None else "—")
+with c3:
+    st.metric("Real GDP growth", f"{gdp_growth:.1f}%" if gdp_growth is not None else "—")
+with c4:
+    st.metric("GDP · current KES", f"KES {gdp_lcu / 1e12:.2f}T" if gdp_lcu is not None else "—")
 
 st.divider()
 
-# ── Charts Row 1 ──────────────────────────────────────────
-col1, col2 = st.columns(2)
-
-with col1:
-    st.subheader("Kenya GDP — USD billions")
-    macro_chart = macro.sort_values("year")
-    fig = px.bar(
-        macro_chart,
-        x="year",
-        y="gdp_usd_billions",
-        color_discrete_sequence=["#1D9E75"],
-        labels={"gdp_usd_billions": "GDP (USD B)", "year": "Year"},
-        text="gdp_usd_billions",
-    )
-    fig.update_traces(texttemplate="%{text:.1f}B", textposition="outside")
-    fig.update_layout(
-        plot_bgcolor="rgba(0,0,0,0)",
-        paper_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=0, r=0, t=10, b=0),
-        showlegend=False,
-        yaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.1)"),
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-with col2:
-    st.subheader("Inflation rate — annual %")
-    macro_chart = macro.sort_values("year")
-    fig = px.line(
-        macro_chart,
-        x="year",
-        y="inflation_pct",
-        color_discrete_sequence=["#D85A30"],
-        markers=True,
-        labels={"inflation_pct": "Inflation (%)", "year": "Year"},
-    )
-    fig.update_traces(marker=dict(size=8))
-    fig.update_layout(
-        plot_bgcolor="rgba(0,0,0,0)",
-        paper_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=0, r=0, t=10, b=0),
-        yaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.1)"),
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-# ── Charts Row 2 ──────────────────────────────────────────
-col1, col2 = st.columns(2)
-
-with col1:
-    st.subheader("KES/USD — live Kafka stream")
-    if len(fx_live) > 0:
-        fx_chart = fx_live.sort_values("rate_timestamp")
-        fig = px.line(
-            fx_chart,
-            x="rate_timestamp",
-            y="rate",
-            color_discrete_sequence=["#7F77DD"],
-            labels={"rate": "KES per USD", "rate_timestamp": "Time"},
-        )
-        fig.update_layout(
-            plot_bgcolor="rgba(0,0,0,0)",
-            paper_bgcolor="rgba(0,0,0,0)",
-            margin=dict(l=0, r=0, t=10, b=0),
-            yaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.1)"),
-        )
+left, right = st.columns(2)
+with left:
+    st.subheader("Real GDP growth")
+    gdp_history = history[history["indicator_code"] == "REAL_GDP_GROWTH"].copy()
+    if gdp_history.empty:
+        st.info("No GDP growth history is available yet.")
+    else:
+        fig = px.line(gdp_history, x="period_end", y="value", markers=True, labels={"period_end": "Year", "value": "%"})
         st.plotly_chart(fig, use_container_width=True)
+
+with right:
+    st.subheader("Headline inflation")
+    cpi_history = history[history["indicator_code"] == "CPI_INFLATION_YOY"].copy()
+    if cpi_history.empty:
+        st.info("No KNBS inflation history is available yet.")
     else:
-        st.info("No FX stream data yet — start the Kafka consumer")
-
-with col2:
-    st.subheader("Purchasing power index")
-    fig = px.line(
-        pp,
-        x="year",
-        y="purchasing_power_index",
-        color_discrete_sequence=["#BA7517"],
-        markers=True,
-        labels={"purchasing_power_index": "Index", "year": "Year"},
-    )
-    fig.add_hline(
-        y=100,
-        line_dash="dash",
-        line_color="gray",
-        opacity=0.4,
-        annotation_text="baseline 100",
-    )
-    fig.update_traces(marker=dict(size=8))
-    fig.update_layout(
-        plot_bgcolor="rgba(0,0,0,0)",
-        paper_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=0, r=0, t=10, b=0),
-        yaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.1)"),
-    )
-    st.plotly_chart(fig, use_container_width=True)
+        fig = px.line(cpi_history, x="period_end", y="value", markers=True, labels={"period_end": "Month", "value": "%"})
+        st.plotly_chart(fig, use_container_width=True)
 
 st.divider()
+st.subheader("Data health")
 
-# ── GDP Growth Bar ─────────────────────────────────────────
-st.subheader("Year-over-year GDP growth %")
-growth_data = macro.dropna(subset=["gdp_growth_pct"]).sort_values("year")
-fig = px.bar(
-    growth_data,
-    x="year",
-    y="gdp_growth_pct",
-    color="gdp_growth_pct",
-    color_continuous_scale=["#D85A30", "#1D9E75"],
-    labels={"gdp_growth_pct": "Growth (%)", "year": "Year"},
-    text="gdp_growth_pct",
-)
-fig.update_traces(texttemplate="%{text:+.2f}%", textposition="outside")
-fig.update_xaxes(type="category", categoryorder="category ascending")
-fig.update_layout(
-    plot_bgcolor="rgba(0,0,0,0)",
-    paper_bgcolor="rgba(0,0,0,0)",
-    margin=dict(l=0, r=0, t=10, b=0),
-    showlegend=False,
-    coloraxis_showscale=False,
-    yaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.1)"),
-)
-st.plotly_chart(fig, use_container_width=True)
-
-st.divider()
-
-# ── Data Tables ──────────────────────────────────────────
-col1, col2 = st.columns(2)
-
-with col1:
-    st.subheader("Macro summary")
+if health.empty:
+    st.info("No source-health records yet.")
+else:
+    health_display = health.copy()
+    health_display["Status"] = health_display["freshness_status"].map(
+        lambda value: f"{status_icon(value)} {value.title()}"
+    )
+    columns = ["source", "Status", "latest_observation_date", "last_checked_at", "last_error"]
+    columns = [column for column in columns if column in health_display.columns]
     st.dataframe(
-        macro[
-            ["year", "gdp_usd_billions", "gdp_kes_billions",
-             "inflation_pct", "gdp_growth_pct"]
-        ].rename(columns={
-            "year": "Year",
-            "gdp_usd_billions": "GDP USD (B)",
-            "gdp_kes_billions": "GDP KES (B)",
-            "inflation_pct": "Inflation %",
-            "gdp_growth_pct": "Growth %",
+        health_display[columns].rename(columns={
+            "source": "Source",
+            "latest_observation_date": "Latest observation",
+            "last_checked_at": "Last checked",
+            "last_error": "Last error",
         }),
         use_container_width=True,
         hide_index=True,
     )
 
-with col2:
-    st.subheader("Live FX feed")
-    if len(fx_live) > 0:
-        st.dataframe(
-            fx_live[["rate_timestamp", "rate", "usd_per_kes"]].rename(columns={
-                "rate_timestamp": "Timestamp",
-                "rate": "KES/USD",
-                "usd_per_kes": "USD/KES",
-            }),
-            use_container_width=True,
-            hide_index=True,
-        )
-    else:
-        st.info("Start the Kafka consumer to see live data")
+if not pipeline.empty:
+    latest_run = pipeline.iloc[0]
+    completed = pd.to_datetime(latest_run.get("completed_at"), utc=True, errors="coerce")
+    completed_text = completed.strftime("%d %b %Y · %H:%M UTC") if pd.notna(completed) else "unknown"
+    st.caption(
+        f"Pipeline: {str(latest_run.get('status', 'unknown')).upper()} · "
+        f"last completed {completed_text} · rows added {int(latest_run.get('rows_inserted', 0) or 0)}"
+    )
 
 st.divider()
-
-# ── Footer ───────────────────────────────────────────────
-st.caption(
-    "Pipeline: Airflow · dbt · Kafka · PostgreSQL · "
-    "Data: World Bank + Open Exchange Rates · "
-    "Built by Samwel Ngugi"
-)
+st.subheader("Current observations & provenance")
+if snapshot.empty:
+    st.info("No published observations yet.")
+else:
+    show = snapshot[[
+        "source", "indicator_name", "observation_date", "value", "unit", "source_url", "ingested_at"
+    ]].copy()
+    st.dataframe(show, use_container_width=True, hide_index=True, column_config={"source_url": st.column_config.LinkColumn("Source")})

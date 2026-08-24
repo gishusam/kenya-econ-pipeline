@@ -1,34 +1,28 @@
 version: 2
 
-sources:
-  - name: staging
-    schema: staging
-    tables:
-      - name: stg_worldbank_gdp
-      - name: stg_worldbank_inflation
-      - name: stg_fx_rates
-
 models:
-  - name: stg_gdp
-    description: "Kenya GDP cleaned from World Bank staging table"
+  - name: stg_economic_observations
+    description: Canonical cross-source economic observations. All source revisions are retained.
     columns:
-      - name: year
+      - name: source_record_hash
+        tests: [not_null, unique]
+      - name: source
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['KNBS', 'CBK', 'WORLD_BANK']
+      - name: indicator_code
         tests: [not_null]
-      - name: value_usd
+      - name: geography
         tests: [not_null]
-
-  - name: stg_inflation
-    description: "Kenya CPI inflation rate from World Bank"
-    columns:
-      - name: year
+      - name: frequency
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['daily', 'monthly', 'quarterly', 'annual']
+      - name: value
         tests: [not_null]
-      - name: inflation_pct
+      - name: revision_rank
         tests: [not_null]
-
-  - name: stg_fx
-    description: "KES exchange rates enriched with derived columns"
-    columns:
-      - name: kes_per_usd
-        tests: [not_null]
-      - name: rate_timestamp
+      - name: is_latest_revision
         tests: [not_null]

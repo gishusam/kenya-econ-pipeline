@@ -1,0 +1,90 @@
+name: Deploy autonomous pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  JOB_NAME: kenya-econ-refresh
+  SCHEDULER_JOB_NAME: kenya-econ-daily
+  AR_REPOSITORY: kenya-econ
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Configure Artifact Registry auth
+        run: gcloud auth configure-docker "${{ vars.GCP_REGION }}-docker.pkg.dev" --quiet
+
+      - name: Build and push image
+        id: image
+        shell: bash
+        run: |
+          IMAGE="${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${AR_REPOSITORY}/pipeline:${GITHUB_SHA}"
+          docker build -t "${IMAGE}" .
+          docker push "${IMAGE}"
+          echo "uri=${IMAGE}" >> "${GITHUB_OUTPUT}"
+
+      - name: Deploy Cloud Run Job
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          job: ${{ env.JOB_NAME }}
+          image: ${{ steps.image.outputs.uri }}
+          flags: >-
+            --region=${{ vars.GCP_REGION }}
+            --service-account=kenya-econ-pipeline@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+            --set-env-vars=GCP_PROJECT_ID=${{ vars.GCP_PROJECT_ID }},BQ_LOCATION=${{ vars.BQ_LOCATION }},GIT_SHA=${{ github.sha }}
+            --task-timeout=15m
+            --max-retries=1
+            --memory=1Gi
+            --cpu=1
+
+      - name: Grant scheduler permission and ensure daily trigger
+        shell: bash
+        run: |
+          SCHEDULER_SA="kenya-econ-scheduler@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
+          URI="https://run.googleapis.com/v2/projects/${{ vars.GCP_PROJECT_ID }}/locations/${{ vars.GCP_REGION }}/jobs/${JOB_NAME}:run"
+
+          gcloud run jobs add-iam-policy-binding "${JOB_NAME}" \
+            --region="${{ vars.GCP_REGION }}" \
+            --member="serviceAccount:${SCHEDULER_SA}" \
+            --role="roles/run.invoker" \
+            --quiet
+
+          if gcloud scheduler jobs describe "${SCHEDULER_JOB_NAME}" --location="${{ vars.GCP_SCHEDULER_REGION }}" >/dev/null 2>&1; then
+            gcloud scheduler jobs update http "${SCHEDULER_JOB_NAME}" \
+              --location="${{ vars.GCP_SCHEDULER_REGION }}" \
+              --schedule="15 6 * * *" \
+              --time-zone="Africa/Nairobi" \
+              --uri="${URI}" \
+              --http-method=POST \
+              --oauth-service-account-email="${SCHEDULER_SA}" \
+              --quiet
+          else
+            gcloud scheduler jobs create http "${SCHEDULER_JOB_NAME}" \
+              --location="${{ vars.GCP_SCHEDULER_REGION }}" \
+              --schedule="15 6 * * *" \
+              --time-zone="Africa/Nairobi" \
+              --uri="${URI}" \
+              --http-method=POST \
+              --oauth-service-account-email="${SCHEDULER_SA}" \
+              --quiet
+          fi

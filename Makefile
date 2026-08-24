@@ -1,29 +1,18 @@
-.PHONY: up down migrate ingest transform stream dashboard
+.PHONY: test compile dbt-parse docker-build bootstrap-gcp
 
-up:
-	docker-compose up postgres zookeeper kafka -d
-	sleep 10
+test:
+	pytest -q
 
-down:
-	docker-compose down
+compile:
+	python -m compileall -q pipeline dashboard
 
-migrate:
-	python -m db.migrate
+dbt-parse:
+	GCP_PROJECT_ID=$${GCP_PROJECT_ID:?Set GCP_PROJECT_ID} \
+	BQ_LOCATION=$${BQ_LOCATION:-africa-south1} \
+	dbt parse --project-dir kenya_econ_dbt --profiles-dir kenya_econ_dbt --target prod
 
-ingest:
-	python -m ingestion.worldbank
-	python -m ingestion.fx_rates
-	python -m db.loaders.worldbank_loader
-	python -m db.loaders.fx_loader
+docker-build:
+	docker build -t kenya-econ-refresh:local .
 
-transform:
-	cd kenya_econ_dbt && dbt run && dbt test
-
-stream:
-	python -m streaming.topic_setup
-
-dashboard:
-	streamlit run dashboard/app.py
-
-setup: up migrate ingest transform
-	@echo "Pipeline ready. Run 'make dashboard' to view."
+bootstrap-gcp:
+	bash infra/gcp/bootstrap.sh

@@ -1,0 +1,17 @@
+# Runtime/components removed by the v2 architecture.
+dags
+streaming
+ingestion
+db
+utils
+data
+assets
+docker-compose.yml
+airflow.cfg
+airflow-webserver.pid
+
+# Replaced wholesale by the v2 BigQuery/dbt project.
+kenya_econ_dbt
+
+# Replaced wholesale to avoid retaining Postgres dashboard code/config.
+dashboard

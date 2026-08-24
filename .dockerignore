@@ -1,0 +1,16 @@
+.git
+.github
+.pytest_cache
+__pycache__
+*.pyc
+.env
+.venv
+venv
+logs
+assets
+dashboard
+tests
+docs
+gha-creds-*.json
+kenya_econ_dbt/target
+kenya_econ_dbt/logs

@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: indicator_history
+    description: Historical economic series using the latest known revision for every source/indicator/period.
+    columns:
+      - name: source_record_hash
+        tests: [not_null, unique]
+      - name: value
+        tests: [not_null]
+
+  - name: latest_indicators
+    description: Latest available observation for each source and indicator.
+    columns:
+      - name: source
+        tests: [not_null]
+      - name: indicator_code
+        tests: [not_null]
+      - name: value
+        tests: [not_null]
+
+  - name: economic_snapshot
+    description: Dashboard-facing current economic snapshot with provenance and ingestion freshness.
+    columns:
+      - name: observation_date
+        tests: [not_null]
+      - name: source_url
+        tests: [not_null]
+
+  - name: source_health
+    description: Latest source check and observation freshness state.
+    columns:
+      - name: source
+        tests: [not_null, unique]
+      - name: freshness_status
+        tests:
+          - accepted_values:
+              values: ['CURRENT', 'STALE', 'DEGRADED']
+
+  - name: pipeline_status
+    description: Latest completed autonomous pipeline run.
+    columns:
+      - name: run_id
+        tests: [not_null, unique]
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['success', 'degraded', 'failed']
