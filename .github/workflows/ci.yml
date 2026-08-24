@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Unit tests
+        run: pytest -q
+      - name: Python compile check
+        run: python -m compileall -q pipeline dashboard
+      - name: dbt parse
+        env:
+          GCP_PROJECT_ID: kenya-econ-ci
+          BQ_LOCATION: africa-south1
+        run: dbt parse --project-dir kenya_econ_dbt --profiles-dir kenya_econ_dbt --no-partial-parse
+      - name: Validate Docker build
+        run: docker build -t kenya-econ-ci .

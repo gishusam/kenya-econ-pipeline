@@ -1,336 +1,296 @@
-# 🇰🇪 Kenya Economic Intelligence Pipeline
+# 🇰🇪 Kenya Economic Intelligence
 
-A production-grade, end-to-end data engineering project that ingests, transforms, streams, and visualises Kenya's macroeconomic indicators in real time — built on the modern data stack.
+An autonomous, revision-aware data pipeline for Kenya's core economic indicators.
 
-[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
-[![dbt](https://img.shields.io/badge/dbt-1.7-orange.svg)](https://getdbt.com)
-[![Airflow](https://img.shields.io/badge/Airflow-2.8-green.svg)](https://airflow.apache.org)
-[![Kafka](https://img.shields.io/badge/Kafka-7.5-black.svg)](https://kafka.apache.org)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.32-red.svg)](https://streamlit.io)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://postgresql.org)
+The project collects official economic observations from **KNBS**, **CBK**, and the **World Bank**, preserves source revisions in BigQuery, standardizes them with dbt, and publishes trusted marts to a Streamlit dashboard. The production path is intentionally batch-oriented: **no Airflow, no Kafka, and no always-on server**.
 
----
-## Dashboard Preview
+> **Architecture principle:** the system should keep collecting, validating, and publishing data when the developer's laptop is switched off. Human intervention is reserved for failures, source-format changes, and model changes.
 
-![Kenya Economic Intelligence Dashboard](assets/dashboard-preview.png)
+## The real-world problem
 
----
+Kenyan economic data is published by different institutions, on different cadences, and in different formats. A finance, research, strategy, or investment team tracking GDP, inflation, and exchange rates has to repeatedly:
 
-## Problem Statement
+- locate the latest official release;
+- determine whether a historical observation was revised;
+- reconcile incompatible source schemas;
+- verify whether its local dataset is still current; and
+- refresh downstream analysis without silently mixing stale and fresh data.
 
-Kenya's economic data — GDP, inflation, and foreign exchange rates — is scattered across the World Bank, the Central Bank of Kenya, and third-party FX providers with no unified, automated data layer. Analysts manually download CSVs, reconcile different formats, and build one-off spreadsheets. Fintech and investment teams lack a reliable, always-fresh FX feed. Policy teams cannot track macro trends in near real-time.
+That is a **data reliability problem before it is an analytics problem**.
 
-This pipeline solves that. It automates the full data journey — from raw API ingestion to a live dashboard — and produces analytical outputs no single source can provide, including Kenya's GDP expressed in KES, a real purchasing power index, and a continuously updating KES/USD time-series.
-
----
-
-## Live Dashboard
-
-🔗 **[kenya-economic-intelligence.streamlit.app](https://gishusam-kenya-econ-pipeline-dashboardapp-olrpi8.streamlit.app)**
-
----
-
-## What It Produces
-
-| Metric | Description | Source |
-|--------|-------------|--------|
-| GDP in KES | Kenya GDP converted from USD at live FX rate | World Bank × Open Exchange Rates |
-| YoY GDP growth | Year-over-year percentage change | Derived by dbt |
-| Inflation trend | Annual CPI rate 2020–2024 | World Bank |
-| Purchasing power index | Inflation + FX depreciation combined | Flagship dbt model |
-| Live KES/USD rate | Streamed every 60 seconds via Kafka | Open Exchange Rates |
-| FX daily summary | Min, max, average rate per day | Derived by dbt |
-
----
+Kenya Economic Intelligence automates that operational layer. It checks authoritative sources, appends new and revised observations without overwriting history, applies a canonical data contract, runs dbt tests, and exposes freshness-aware analytical tables to the dashboard.
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Data Sources                             │
-│   World Bank API          Open Exchange Rates API               │
-│   (GDP, inflation)        (KES/USD live rate)                   │
-└──────────┬───────────────────────────┬──────────────────────────┘
-           │                           │
-           ▼                           ▼
-┌──────────────────┐        ┌─────────────────────┐
-│  Python Ingestion │        │   Kafka Producer     │
-│  worldbank.py     │        │   fx_producer.py     │
-│  fx_rates.py      │        │   (every 60 seconds) │
-└──────────┬────────┘        └──────────┬──────────┘
-           │                            │
-           ▼                            ▼
-┌──────────────────┐        ┌─────────────────────┐
-│  data/raw/       │        │   Kafka Topic        │
-│  JSON files      │        │   fx_rates_ke        │
-└──────────┬────────┘        └──────────┬──────────┘
-           │                            │
-           ▼                            ▼
-┌──────────────────────────────────────────────────┐
-│              PostgreSQL Warehouse                 │
-│  ┌──────────┐  ┌───────────┐  ┌───────────────┐  │
-│  │   raw    │→ │  staging  │→ │     mart      │  │
-│  │ (exact)  │  │ (cleaned) │  │  (analytics)  │  │
-│  └──────────┘  └───────────┘  └───────────────┘  │
-└──────────────────────┬───────────────────────────┘
-                       │
-           ┌───────────┼───────────┐
-           ▼           ▼           ▼
-      dbt models   Airflow DAG  Streamlit
-      (transform)  (schedule)   (dashboard)
-```
+```text
+                         Google Cloud Scheduler
+                         europe-west1 (06:15 EAT)
+                                  │
+                                  ▼
+                         Cloud Run Job
+                      kenya-econ-refresh
+                       africa-south1
+                                  │
+                 ┌────────────────┼────────────────┐
+                 ▼                ▼                ▼
+               KNBS              CBK          World Bank
+                 │                │                │
+                 └────────────────┼────────────────┘
+                                  │
+                    canonicalize + fingerprint
+                                  │
+                                  ▼
+                           BigQuery · raw
+                    append-only source revisions
+                                  │
+                               dbt build
+                                  │
+                                  ▼
+                        BigQuery · staging
+                       canonical data contract
+                                  │
+                              dbt tests
+                                  │
+                                  ▼
+                          BigQuery · marts
+                     trusted/latest observations
+                                  │
+                                  ▼
+                         Streamlit Cloud
+                    economics + data health
 
----
-
-## Tech Stack
-
-| Layer | Tool | Version |
-|-------|------|---------|
-| Ingestion | Python, requests, tenacity | 3.11+ |
-| Storage | PostgreSQL | 15 |
-| Transformation | dbt-postgres | 1.7 |
-| Orchestration | Apache Airflow | 2.8 |
-| Streaming | Apache Kafka (Confluent) | 7.5 |
-| Streaming client | kafka-python | 2.0.2 |
-| Dashboard | Streamlit, Plotly | 1.32, 5.20 |
-| Infrastructure | Docker, Docker Compose | — |
-| Production DB | Neon (serverless Postgres) | — |
-
----
-
-## Project Structure
-
-```
-kenya-econ-pipeline/
-│
-├── ingestion/                  # API clients
-│   ├── base_client.py          # Shared HTTP logic, retry, logging
-│   ├── worldbank.py            # World Bank GDP + inflation ingester
-│   └── fx_rates.py             # Open Exchange Rates FX ingester
-│
-├── db/                         # Storage layer
-│   ├── connection.py           # Connection manager (context manager)
-│   ├── migrate.py              # Runs versioned SQL migrations
-│   ├── migrations/
-│   │   ├── 001_create_schemas.sql
-│   │   ├── 002_create_raw_tables.sql
-│   │   └── 003_create_staging_tables.sql
-│   └── loaders/
-│       ├── worldbank_loader.py # JSON → raw → staging
-│       └── fx_loader.py        # JSON → raw → staging
-│
-├── kenya_econ_dbt/             # Transformation layer
-│   ├── models/
-│   │   ├── staging/
-│   │   │   ├── stg_gdp.sql
-│   │   │   ├── stg_inflation.sql
-│   │   │   └── stg_fx.sql
-│   │   └── mart/
-│   │       ├── kenya_macro.sql
-│   │       ├── fx_daily_summary.sql
-│   │       └── purchasing_power.sql
-│   └── macros/
-│       └── generate_schema_name.sql
-│
-├── dags/                       # Orchestration layer
-│   └── kenya_econ_dag.py       # Airflow DAG (6 tasks, daily 06:00 EAT)
-│
-├── streaming/                  # Streaming layer
-│   ├── topic_setup.py          # Creates Kafka topics
-│   ├── fx_producer.py          # Publishes FX events every 60s
-│   └── fx_consumer.py          # Writes Kafka events to Postgres
-│
-├── dashboard/                  # Visualisation layer
-│   ├── app.py                  # Streamlit dashboard
-│   └── requirements.txt        # Dashboard-only dependencies
-│
-├── utils/                      # Shared utilities
-│   ├── logger.py               # JSON structured logging
-│   └── validators.py           # API response validation
-│
-├── docker-compose.yml          # Full stack (Postgres, Airflow, Kafka)
-├── Makefile                    # One-command setup
-├── requirements.txt            # All dependencies
-└── .env.example                # Environment variable template
+GitHub ── PR ──> CI tests / dbt parse / container build
+   │
+   └── main ──> WIF auth ──> Artifact Registry ──> Cloud Run deploy
 ```
 
----
+`africa-south1` keeps BigQuery and Cloud Run together in Johannesburg. Cloud Scheduler is configured separately in `europe-west1` because Scheduler is not available in Johannesburg.
 
-## Quick Start
+## Why these tools
 
-### Prerequisites
-- Docker and Docker Compose
-- Python 3.11+
-- A free API key from [openexchangerates.org](https://openexchangerates.org)
+| Concern | Choice | Why |
+|---|---|---|
+| Warehouse | BigQuery | Serverless warehouse; no database server to patch or keep running |
+| Transformations | dbt-bigquery | Contracts, tests, lineage, and explicit transformation ownership |
+| Runtime | Cloud Run Jobs | Bounded batch execution with no always-on compute |
+| Scheduling | Cloud Scheduler | Independent of GitHub repository activity and developer machines |
+| CI/CD | GitHub Actions | One place for tests and deployment; WIF avoids long-lived GCP keys |
+| Dashboard | Streamlit Community Cloud | Lightweight public data-product UI with no local runtime |
 
-### Setup
+### Why not Airflow?
+
+The pipeline is a small linear batch workflow. Running an Airflow scheduler/webserver 24/7 would create more infrastructure than orchestration value. Airflow is better demonstrated in a project with genuine task interdependency.
+
+### Why not Kafka?
+
+These sources are low-volume and batch-oriented. There is no high-throughput event stream to buffer and no fan-out of independent consumers. An earlier version used Kafka for polled FX data; removing it is deliberate simplification, not a missing feature.
+
+## Data sources
+
+The first production slice ingests:
+
+| Source | Indicator | Frequency | Role |
+|---|---|---:|---|
+| KNBS | Headline CPI inflation (YoY) | Monthly | Authoritative Kenya inflation release |
+| CBK | USD/KES exchange rate | Daily | Authoritative domestic FX observation |
+| World Bank | Real GDP growth | Annual | Historical macro series |
+| World Bank | GDP in current local currency | Annual | Historical nominal GDP series in KES |
+
+The daily pipeline *checks* all sources every run, but unchanged observations are not re-appended.
+
+## Warehouse design
+
+The warehouse uses three analytical layers plus an operational metadata dataset.
+
+```text
+raw  →  staging  →  marts
+          │
+metadata ─┴──── pipeline/source health
+```
+
+### `raw`
+
+`raw.economic_observations` is append-only. Every ingested row carries:
+
+- the source and indicator identity;
+- observation period and value;
+- source URL and original parsed payload;
+- deterministic `source_record_hash`;
+- `run_id` and ingestion timestamp.
+
+If an institution revises a value, the old row remains and a new revision is appended.
+
+### `staging`
+
+`staging.stg_economic_observations` gives every source the same contract and ranks revisions for each natural observation key.
+
+Natural revision key:
+
+```text
+(source, indicator_code, geography, period_start, period_end)
+```
+
+### `marts`
+
+Dashboard-facing models use only the latest known revision per period.
+
+- `marts.indicator_history` — historical series with revisions resolved.
+- `marts.latest_indicators` — latest observation per source/indicator.
+- `marts.economic_snapshot` — compact dashboard snapshot with provenance.
+- `marts.source_health` — last source check + observation freshness.
+- `marts.pipeline_status` — latest completed pipeline execution.
+
+The Streamlit application queries **marts only**.
+
+## Failure semantics
+
+Source checks are isolated. A temporary failure in one source does not discard successful ingestion from the others.
+
+| Outcome | Pipeline state |
+|---|---|
+| All sources + dbt succeed | `success` |
+| One or more sources fail but dbt builds from existing valid data | `degraded` |
+| dbt fails, or every source fails | `failed` |
+
+A degraded run exits non-zero in Cloud Run intentionally: the valid data remains available, while the platform still surfaces that intervention may be required.
+
+**Rule:** stale data may remain visible, but it must never be presented as fresh.
+
+## Project structure
+
+```text
+pipeline/
+  models.py              canonical observation contract
+  hashing.py             deterministic revision fingerprints
+  refresh.py             source-isolated refresh orchestration
+  warehouse.py           append-only BigQuery adapter
+  sources/
+    knbs.py
+    cbk.py
+    world_bank.py
+
+kenya_econ_dbt/
+  models/
+    staging/
+    marts/
+  profiles.yml
+
+dashboard/
+  app.py
+  data.py
+
+infra/
+  bigquery/bootstrap.sql
+  gcp/bootstrap.sh
+
+.github/workflows/
+  ci.yml
+  deploy.yml
+
+tests/
+```
+
+## Local development
+
+Python 3.11 is the production runtime.
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/samwelngugi/kenya-econ-pipeline.git
-cd kenya-econ-pipeline
-
-# 2. Copy environment template and add your API key
-cp .env.example .env
-
-# 3. Spin up infrastructure and load data
-make setup
-
-# 4. Launch the dashboard
-make dashboard
-# Opens at http://localhost:8501
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+pytest -q
 ```
 
-### Manual setup (step by step)
+Compile check:
 
 ```bash
-# Start Docker services
-docker-compose up postgres zookeeper kafka -d
+make compile
+```
 
-# Run database migrations
-python -m db.migrate
+To run the dashboard locally, install its UI dependencies separately:
 
-# Ingest data from APIs
-python -m ingestion.worldbank
-python -m ingestion.fx_rates
-
-# Load into Postgres
-python -m db.loaders.worldbank_loader
-python -m db.loaders.fx_loader
-
-# Run dbt transformations
-cd kenya_econ_dbt && dbt run && dbt test
-
-# Start Kafka streaming (two terminals)
-python -m streaming.fx_producer    # Terminal 1
-python -m streaming.fx_consumer    # Terminal 2
-
-# Launch dashboard
+```bash
+pip install -r dashboard/requirements.txt
 streamlit run dashboard/app.py
 ```
 
----
+With Google Application Default Credentials and a GCP project configured:
 
-## Data Sources
+```bash
+cp .env.example .env
+export GCP_PROJECT_ID="your-project-id"
+export BQ_LOCATION="africa-south1"
 
-| Source | Data | Auth | Cost |
-|--------|------|------|------|
-| [World Bank API](https://datahelpdesk.worldbank.org/knowledgebase/articles/889392) | GDP, CPI inflation for Kenya | None required | Free |
-| [Open Exchange Rates](https://openexchangerates.org) | Live KES/USD, EUR, GBP rates | Free API key | Free tier |
-
----
-
-## Pipeline Details
-
-### Airflow DAG — `kenya_econ_pipeline`
-
-Runs daily at **06:00 EAT (03:00 UTC)** with the following task chain:
-
-```
-migrate_db → [worldbank_ingest, fx_ingest] → load_to_postgres → dbt_run → dbt_test
+dbt parse \
+  --project-dir kenya_econ_dbt \
+  --profiles-dir kenya_econ_dbt \
+  --target prod
 ```
 
-| Task | Type | Description |
-|------|------|-------------|
-| `migrate_db` | PythonOperator | Creates schemas and tables if not present |
-| `worldbank_ingest` | PythonOperator | Pulls GDP + inflation from World Bank API |
-| `fx_ingest` | PythonOperator | Pulls KES/USD rate from Open Exchange Rates |
-| `load_to_postgres` | PythonOperator | Loads raw JSON → raw schema → staging schema |
-| `dbt_run` | BashOperator | Builds all mart models |
-| `dbt_test` | BashOperator | Runs 14 data quality tests |
+## First GCP deployment
 
-### dbt Models
+The bootstrap script creates the required APIs, BigQuery datasets/tables, Artifact Registry repository, service accounts, and GitHub Workload Identity Federation configuration.
 
-| Model | Schema | Type | Description |
-|-------|--------|------|-------------|
-| `stg_gdp` | staging | View | Cleaned World Bank GDP data |
-| `stg_inflation` | staging | View | Cleaned CPI inflation data |
-| `stg_fx` | staging | View | Enriched FX rates with derived columns |
-| `kenya_macro` | mart | Table | Core macro table — GDP, inflation, FX, growth |
-| `fx_daily_summary` | mart | Table | Daily min/max/avg KES rate |
-| `purchasing_power` | mart | Table | Flagship metric — inflation × FX index |
-
-### Kafka Streaming
-
-```
-Producer (fx_producer.py)
-  └── Polls Open Exchange Rates every 60 seconds
-  └── Publishes JSON event to topic: fx_rates_ke
-        └── { base, target_currency, rate, event_timestamp }
-
-Consumer (fx_consumer.py)
-  └── Reads from topic fx_rates_ke
-  └── Derives usd_per_kes = 1 / rate
-  └── Writes to staging.stg_fx_rates (ON CONFLICT DO NOTHING)
+```bash
+export PROJECT_ID="your-project-id"
+export GITHUB_REPO="gishusam/kenya-econ-pipeline"
+bash infra/gcp/bootstrap.sh
 ```
 
-### Three-Layer Warehouse
+It prints the GitHub repository variables required by `.github/workflows/deploy.yml`, including separate compute and Scheduler regions.
 
-| Layer | Schema | Purpose |
-|-------|--------|---------|
-| Raw | `raw` | Exact copy of API response — audit trail, never modified |
-| Staging | `staging` | Typed, cleaned, deduplicated — SCD Type 2 on World Bank data |
-| Mart | `mart` | Business logic, derived metrics, analytics-ready |
+After those variables are set, a push to `main` builds the container and deploys `kenya-econ-refresh`. The deploy workflow creates/updates the daily Cloud Scheduler trigger for **06:15 Africa/Nairobi**.
 
----
+## Streamlit deployment
 
-## Key Engineering Decisions
+The dashboard needs:
 
-**Idempotency** — Every loader uses `ON CONFLICT DO NOTHING`. Every dbt model is a `CREATE OR REPLACE`. The pipeline can run any number of times and produce the same result.
+```toml
+GCP_PROJECT_ID = "your-project-id"
+BQ_LOCATION = "africa-south1"
+```
 
-**SCD Type 2** — Staging tables for World Bank data include `valid_from`, `valid_to`, and `is_current` columns. When the World Bank revises a historical GDP figure, the old row closes and a new one opens — full revision history preserved.
+Streamlit Community Cloud must use the dedicated **read-only** dashboard service account if a credential is required. See `.streamlit/secrets.example.toml`. Do not reuse the Cloud Run or deployment identity.
 
-**Separation of concerns** — Raw data is never modified after landing. Staging imposes data types and structure. Mart imposes business logic. A failure in any layer never corrupts another.
+## CI/CD security
 
-**Structured logging** — Every module uses JSON-formatted logs compatible with Airflow's log aggregation. No `print()` statements anywhere in the codebase.
+GitHub Actions uses Google Workload Identity Federation. No long-lived Google service-account JSON key is stored in GitHub.
 
-**Connection resilience** — SQLAlchemy engine uses `pool_pre_ping=True` and `pool_recycle=300` to handle stale connections. Postgres connections include `idle_in_transaction_session_timeout` to prevent abandoned Airflow tasks from holding locks.
+The identities are intentionally separate:
 
----
+- `kenya-econ-pipeline` — Cloud Run ingestion/dbt runtime;
+- `kenya-econ-scheduler` — permission to invoke the job;
+- `kenya-econ-deploy` — GitHub deployment identity;
+- `kenya-econ-dashboard` — read-only dashboard identity.
 
-## Dashboard
+## Migration from v1
 
-The Streamlit dashboard connects directly to the mart schema and displays:
+Version 1 demonstrated Postgres, Airflow, Kafka, dbt, and Streamlit, but several components existed primarily to demonstrate tooling rather than to serve this workload. Version 2 deliberately removes:
 
-- **KPI row** — Latest GDP (USD + KES), inflation rate, live KES/USD from Kafka
-- **GDP bar chart** — Annual GDP 2020–2024 in USD billions
-- **Inflation line chart** — CPI trend showing the 2022–2023 peak and 2024 recovery
-- **KES/USD time-series** — Live stream from Kafka, every hourly snapshot
-- **Purchasing power index** — Compound effect of inflation and FX depreciation
-- **YoY growth chart** — Colour-coded positive/negative growth by year
-- **Data tables** — Full macro summary and live FX feed
+- local Postgres and database migrations/loaders;
+- Docker Compose as the production runtime;
+- Airflow DAG/webserver/scheduler configuration;
+- Kafka, ZooKeeper, producer, and consumer processes;
+- OpenExchangeRates from the authoritative data path;
+- local raw JSON files as pipeline state.
 
----
+Git history preserves the original implementation; dead runtime code is not retained in a `legacy/` directory.
 
-## What the Data Shows
+## Current rebuild status
 
-Kenya's GDP contracted in USD terms from $114.4B (2022) to $107.5B (2023) — not because the economy shrank, but because KES depreciated significantly against the dollar. In local currency, the economy continued growing. By 2024, GDP recovered strongly to $120.3B (+11.94% YoY) while inflation cooled from 7.67% to 4.49%.
+- [x] Canonical revision-aware observation contract
+- [x] KNBS, CBK, and World Bank source adapters
+- [x] Append-only BigQuery warehouse adapter
+- [x] Source-isolated refresh runner
+- [x] BigQuery dbt staging/mart models and contracts
+- [x] Streamlit BigQuery/data-health migration
+- [x] Cloud Run container definition
+- [x] GitHub Actions CI/CD + WIF bootstrap
+- [ ] Apply migration to the GitHub repository
+- [ ] Bootstrap the target GCP project and execute the first live run
+- [ ] Configure Streamlit Community Cloud against the new marts
 
-The purchasing power index — a metric this pipeline derives that no single data source provides — shows that despite GDP growth, Kenyan households have never regained the purchasing power of 2020 (index peaked at 95.70 in 2024 vs baseline 100).
+## Design docs
 
----
-
-## Project Status
-
-- [x] Week 1 — Ingestion layer (World Bank + FX APIs, retry logic, structured logging)
-- [x] Week 2 — Storage layer (Docker, PostgreSQL, 3-layer schema, SCD Type 2)
-- [x] Week 3 — Transformation layer (dbt models, 14 data quality tests, lineage graph)
-- [x] Week 4 — Orchestration layer (Airflow DAG, 6 tasks, daily schedule, retry logic)
-- [x] Week 5 — Streaming layer (Kafka producer/consumer, real-time KES/USD feed)
-- [x] Week 6 — Dashboard + deploy (Streamlit, Plotly, Neon, Streamlit Cloud)
-
----
-
-## Author
-
-**Samwel Ngugi** — Junior Data Engineer, Nairobi, Kenya  
-Open to remote data engineering roles.
-
-Specialising in production pipelines on the modern data stack:  
-Python · Airflow · dbt · Kafka · BigQuery · GCP · Docker
-
-[GitHub](https://github.com/samwelngugi) · 
-[LinkedIn](https://linkedin.com/in/samwelngugi) · 
-[Live Dashboard](https://kenya-economic-intelligence.streamlit.app) · 
-📩 sammiegichu@gmail.com
-
+- `docs/superpowers/specs/2026-08-24-autonomous-kenya-econ-design.md`
+- `docs/superpowers/plans/2026-08-24-autonomous-kenya-econ.md`
