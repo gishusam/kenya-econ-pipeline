@@ -1,3 +1,5 @@
+{{ config(materialized="view") }}
+
 select
     run_id,
     started_at,
