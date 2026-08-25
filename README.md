@@ -1,135 +1,170 @@
 # 🇰🇪 Kenya Economic Intelligence
 
-[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-Open-FF4B4B?logo=streamlit&logoColor=white)](https://kenya-economic-intelligence.streamlit.app/)
+[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Open%20App-FF4B4B?logo=streamlit&logoColor=white)](https://kenya-economic-intelligence.streamlit.app/)
 [![CI](https://github.com/gishusam/kenya-econ-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/gishusam/kenya-econ-pipeline/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![BigQuery](https://img.shields.io/badge/BigQuery-Warehouse-4285F4?logo=googlebigquery&logoColor=white)
+![dbt](https://img.shields.io/badge/dbt-Transformations-FF694B?logo=dbt&logoColor=white)
+![GCP](https://img.shields.io/badge/Google%20Cloud-Production-4285F4?logo=googlecloud&logoColor=white)
 
-An autonomous, revision-aware data pipeline for Kenya's core economic indicators.
+**A production data platform for collecting, versioning, validating, and publishing Kenya's core economic indicators from official sources.**
 
-**Live dashboard:** https://kenya-economic-intelligence.streamlit.app/
+Kenya Economic Intelligence turns fragmented public economic releases from the **Kenya National Bureau of Statistics (KNBS)**, **Central Bank of Kenya (CBK)**, and the **World Bank** into a trusted, revision-aware analytical dataset and a continuously refreshed public dashboard.
 
-The project collects official economic observations from **KNBS**, **CBK**, and the **World Bank**, preserves source revisions in BigQuery, standardizes them with dbt, and publishes trusted marts to a Streamlit dashboard. The production path is intentionally batch-oriented: **no Airflow, no Kafka, and no always-on server**.
+**Live product:** [kenya-economic-intelligence.streamlit.app](https://kenya-economic-intelligence.streamlit.app/)
 
-> **Architecture principle:** the system should keep collecting, validating, and publishing data when the developer's laptop is switched off. Human intervention is reserved for failures, source-format changes, and model changes.
+<p align="center">
+  <a href="https://kenya-economic-intelligence.streamlit.app/">
+    <img src="docs/assets/dashboard-preview.png" alt="Kenya Economic Intelligence dashboard" width="100%">
+  </a>
+</p>
 
-## The real-world problem
+---
 
-Kenyan economic data is published by different institutions, on different cadences, and in different formats. A finance, research, strategy, or investment team tracking GDP, inflation, and exchange rates has to repeatedly:
+## Problem
 
-- locate the latest official release;
-- determine whether a historical observation was revised;
-- reconcile incompatible source schemas;
-- verify whether its local dataset is still current; and
-- refresh downstream analysis without silently mixing stale and fresh data.
+Economic data is easy to find individually and difficult to operate reliably as a system.
 
-That is a **data reliability problem before it is an analytics problem**.
+Kenya's macroeconomic indicators are published by different institutions, on different schedules, and in different formats. A team tracking inflation, exchange rates, and GDP must repeatedly determine:
 
-Kenya Economic Intelligence automates that operational layer. It checks authoritative sources, appends new and revised observations without overwriting history, applies a canonical data contract, runs dbt tests, and exposes freshness-aware analytical tables to the dashboard.
+- which release is the latest authoritative observation;
+- whether a historical value has been revised;
+- how differently structured sources map into one analytical model;
+- whether an unchanged value is legitimately current or unexpectedly stale;
+- and whether downstream reports are using validated, up-to-date data.
+
+The hard part is therefore not drawing a chart. It is building a data system that can **continuously acquire, reconcile, validate, version, and serve official observations without losing provenance or silently presenting stale data as current**.
+
+---
+
+## Solution
+
+Kenya Economic Intelligence automates that operational layer end to end.
+
+The platform:
+
+1. checks official sources on a daily schedule;
+2. converts source-specific responses into a canonical observation contract;
+3. fingerprints source records so unchanged observations are not duplicated;
+4. preserves historical revisions in an append-only BigQuery raw layer;
+5. standardizes and tests the data with dbt;
+6. publishes trusted analytical marts containing the latest valid revisions;
+7. records source freshness and pipeline execution health;
+8. serves the published layer through a public Streamlit data product.
+
+The system runs independently of a developer workstation and exposes operational health alongside the economic metrics themselves.
+
+---
 
 ## Architecture
 
-```text
-                         Google Cloud Scheduler
-                         europe-west1 (06:15 EAT)
-                                  │
-                                  ▼
-                         Cloud Run Job
-                      kenya-econ-refresh
-                       africa-south1
-                                  │
-                 ┌────────────────┼────────────────┐
-                 ▼                ▼                ▼
-               KNBS              CBK          World Bank
-                 │                │                │
-                 └────────────────┼────────────────┘
-                                  │
-                    canonicalize + fingerprint
-                                  │
-                                  ▼
-                           BigQuery · raw
-                    append-only source revisions
-                                  │
-                               dbt build
-                                  │
-                                  ▼
-                        BigQuery · staging
-                       canonical data contract
-                                  │
-                              dbt tests
-                                  │
-                                  ▼
-                          BigQuery · marts
-                     trusted/latest observations
-                                  │
-                                  ▼
-                         Streamlit Cloud
-                    economics + data health
+```mermaid
+flowchart LR
+    subgraph Sources["Official Sources"]
+        KNBS["KNBS<br/>Inflation"]
+        CBK["CBK<br/>USD/KES"]
+        WB["World Bank<br/>GDP"]
+    end
 
-GitHub ── PR ──> CI tests / dbt parse / container build
-   │
-   └── main ──> WIF auth ──> Artifact Registry ──> Cloud Run deploy
+    SCH["Cloud Scheduler<br/>06:15 EAT"]
+    JOB["Cloud Run Job<br/>Python ingestion"]
+    RAW[("BigQuery<br/>raw")]
+    STG[("BigQuery<br/>staging")]
+    MARTS[("BigQuery<br/>marts")]
+    META[("BigQuery<br/>metadata")]
+    DBT["dbt build<br/>models + tests"]
+    APP["Streamlit Cloud<br/>public dashboard"]
+
+    SCH --> JOB
+    KNBS --> JOB
+    CBK --> JOB
+    WB --> JOB
+
+    JOB --> RAW
+    JOB --> META
+    RAW --> DBT
+    DBT --> STG
+    STG --> MARTS
+    META --> DBT
+    MARTS --> APP
+
+    GH["GitHub Actions"] -->|"WIF"| AR["Artifact Registry"]
+    AR --> JOB
 ```
 
-`africa-south1` keeps BigQuery and Cloud Run together in Johannesburg. Cloud Scheduler is configured separately in `europe-west1` because Scheduler is not available in Johannesburg.
+### Data path
 
-## Why these tools
+```text
+Official sources
+      ↓
+source-specific adapters
+      ↓
+canonical observation + deterministic fingerprint
+      ↓
+BigQuery raw        ← append-only revision history
+      ↓
+dbt staging         ← normalized analytical contract
+      ↓
+dbt tests           ← quality gate
+      ↓
+BigQuery marts      ← latest trusted revisions
+      ↓
+Streamlit           ← economics + freshness + pipeline health
+```
 
-| Concern | Choice | Why |
-|---|---|---|
-| Warehouse | BigQuery | Serverless warehouse; no database server to patch or keep running |
-| Transformations | dbt-bigquery | Contracts, tests, lineage, and explicit transformation ownership |
-| Runtime | Cloud Run Jobs | Bounded batch execution with no always-on compute |
-| Scheduling | Cloud Scheduler | Independent of GitHub repository activity and developer machines |
-| CI/CD | GitHub Actions | One place for tests and deployment; WIF avoids long-lived GCP keys |
-| Dashboard | Streamlit Community Cloud | Lightweight public data-product UI with no local runtime |
+---
 
-### Why not Airflow?
+## Engineering highlights
 
-The pipeline is a small linear batch workflow. Running an Airflow scheduler/webserver 24/7 would create more infrastructure than orchestration value. Airflow is better demonstrated in a project with genuine task interdependency.
+| Capability | Implementation |
+|---|---|
+| **Revision-aware ingestion** | Historical source values are never overwritten. New revisions are appended and resolved downstream. |
+| **Deterministic deduplication** | Canonical source records are fingerprinted so repeated checks do not create duplicate observations. |
+| **Source isolation** | Each source is checked independently; one unavailable provider does not discard successful work from healthy sources. |
+| **Data contracts** | Heterogeneous source payloads are normalized into a consistent observation model before publication. |
+| **Automated data quality** | dbt tests act as a quality gate between warehouse layers and dashboard-facing marts. |
+| **Freshness monitoring** | Source health is evaluated against the publishing cadence of each provider, not simply whether data changed today. |
+| **Operational metadata** | Pipeline runs and source checks are recorded separately from analytical observations. |
+| **Least-privilege serving** | The dashboard reads published marts only; raw, staging, and metadata datasets remain outside its direct access boundary. |
+| **Authorized views** | Pipeline health is exposed to the dashboard without granting direct access to the underlying metadata table. |
+| **Keyless CI/CD to GCP** | GitHub Actions authenticates through Workload Identity Federation rather than a long-lived deployment key. |
+| **Autonomous execution** | Cloud Scheduler invokes the Cloud Run refresh job daily in production. |
+| **Production validation** | CI runs unit tests, Python compilation, dbt parsing, and a Docker build before changes are accepted. |
 
-### Why not Kafka?
-
-These sources are low-volume and batch-oriented. There is no high-throughput event stream to buffer and no fan-out of independent consumers. An earlier version used Kafka for polled FX data; removing it is deliberate simplification, not a missing feature.
-
-## Data sources
-
-The first production slice ingests:
-
-| Source | Indicator | Frequency | Role |
-|---|---|---:|---|
-| KNBS | Headline CPI inflation (YoY) | Monthly | Authoritative Kenya inflation release |
-| CBK | USD/KES exchange rate | Daily | Authoritative domestic FX observation |
-| World Bank | Real GDP growth | Annual | Historical macro series |
-| World Bank | GDP in current local currency | Annual | Historical nominal GDP series in KES |
-
-The daily pipeline *checks* all sources every run, but unchanged observations are not re-appended.
+---
 
 ## Warehouse design
 
-The warehouse uses three analytical layers plus an operational metadata dataset.
+The warehouse separates immutable source history, analytical transformation, serving models, and operational state.
 
 ```text
-raw  →  staging  →  marts
-          │
-metadata ─┴──── pipeline/source health
+raw ───────────→ staging ───────────→ marts
+ │                  │                   │
+ │ source history   │ normalized data   │ published analytics
+ │ revisions        │ revision ranking  │ dashboard contract
+ │ provenance       │ dbt validation    │ latest valid values
+ │
+ └────────────── metadata
+                 pipeline runs
+                 source checks
+                 health/freshness
 ```
 
 ### `raw`
 
-`raw.economic_observations` is append-only. Every ingested row carries:
+`raw.economic_observations` is append-only. Each observation carries enough information to reconstruct where it came from and when it entered the platform, including:
 
-- the source and indicator identity;
+- source and indicator identity;
 - observation period and value;
-- source URL and original parsed payload;
-- deterministic `source_record_hash`;
-- `run_id` and ingestion timestamp.
+- source URL and parsed source payload;
+- deterministic source record hash;
+- ingestion run ID and timestamp.
 
-If an institution revises a value, the old row remains and a new revision is appended.
+A source revision creates a new row rather than destroying the previous value.
 
 ### `staging`
 
-`staging.stg_economic_observations` gives every source the same contract and ranks revisions for each natural observation key.
-
-Natural revision key:
+`staging.stg_economic_observations` provides a consistent analytical contract across providers and ranks revisions using the natural observation key:
 
 ```text
 (source, indicator_code, geography, period_start, period_end)
@@ -137,63 +172,170 @@ Natural revision key:
 
 ### `marts`
 
-Dashboard-facing models use only the latest known revision per period.
+The dashboard consumes published models rather than querying ingestion tables directly.
 
-- `marts.indicator_history` — historical series with revisions resolved.
-- `marts.latest_indicators` — latest observation per source/indicator.
-- `marts.economic_snapshot` — compact dashboard snapshot with provenance.
-- `marts.source_health` — last source check + observation freshness.
-- `marts.pipeline_status` — latest completed pipeline execution.
+Key models include:
 
-The Streamlit application queries **marts only**.
+- `marts.indicator_history` — revision-resolved historical series;
+- `marts.latest_indicators` — latest valid observation per indicator;
+- `marts.economic_snapshot` — compact cross-indicator economic view;
+- `marts.source_health` — publishing freshness and source check status;
+- `marts.pipeline_status` — latest pipeline execution state.
 
-## Failure semantics
+---
 
-Source checks are isolated. A temporary failure in one source does not discard successful ingestion from the others.
+## Reliability model
 
-| Outcome | Pipeline state |
+A source failure and a pipeline failure are not treated as the same event.
+
+| Condition | Pipeline state | Behaviour |
+|---|---|---|
+| All sources and dbt succeed | `success` | New valid observations are published |
+| One or more sources fail, valid data remains available, dbt succeeds | `degraded` | Healthy source updates are retained and the failure is surfaced |
+| dbt fails or every source fails | `failed` | The execution is marked failed and trusted marts are not silently treated as refreshed |
+
+The serving layer follows one core rule:
+
+> **Stale data may remain available, but it must never be represented as fresh.**
+
+This allows consumers to distinguish an unchanged official publication from an unhealthy ingestion path.
+
+---
+
+## Security
+
+The platform uses separate identities for separate responsibilities.
+
+| Identity | Responsibility |
 |---|---|
-| All sources + dbt succeed | `success` |
-| One or more sources fail but dbt builds from existing valid data | `degraded` |
-| dbt fails, or every source fails | `failed` |
+| `kenya-econ-pipeline` | Production ingestion and dbt runtime |
+| `kenya-econ-scheduler` | Invoke the scheduled Cloud Run job |
+| `kenya-econ-deploy` | GitHub Actions deployment identity |
+| `kenya-econ-dashboard` | Read-only dashboard access to published marts |
 
-A degraded run exits non-zero in Cloud Run intentionally: the valid data remains available, while the platform still surfaces that intervention may be required.
+Key controls:
 
-**Rule:** stale data may remain visible, but it must never be presented as fresh.
+- GitHub → GCP deployment uses **Workload Identity Federation**.
+- The dashboard service account has **BigQuery Job User** plus dataset-scoped read access to `marts`.
+- The dashboard cannot directly query `raw`, `staging`, or `metadata`.
+- `marts.pipeline_status` uses a **BigQuery authorized view** to expose operational health without widening dashboard permissions.
+- Streamlit credentials are kept outside the repository and loaded through secrets management.
 
-## Project structure
+---
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Language | Python |
+| Data sources | KNBS, Central Bank of Kenya, World Bank |
+| Warehouse | Google BigQuery |
+| Transformation | dbt-bigquery |
+| Compute | Google Cloud Run Jobs |
+| Scheduling | Google Cloud Scheduler |
+| Containers | Docker |
+| Container registry | Google Artifact Registry |
+| CI/CD | GitHub Actions |
+| Cloud authentication | Google Workload Identity Federation |
+| Dashboard | Streamlit |
+| Visualization | Plotly |
+| Testing | pytest, dbt tests, compile checks, Docker build validation |
+
+---
+
+## Data sources
+
+| Provider | Indicator | Cadence |
+|---|---|---:|
+| **KNBS** | Headline CPI inflation, year-on-year | Monthly |
+| **CBK** | USD/KES exchange rate | Daily |
+| **World Bank** | Real GDP growth | Annual |
+| **World Bank** | GDP in current local currency | Annual |
+
+The pipeline checks sources daily while preserving each provider's actual publishing cadence.
+
+---
+
+## Production workflow
+
+### Scheduled data refresh
+
+```text
+06:15 EAT
+   ↓
+Cloud Scheduler
+   ↓
+Cloud Run Job
+   ↓
+Fetch sources
+   ↓
+Validate + fingerprint
+   ↓
+Append new/revised observations
+   ↓
+dbt build + tests
+   ↓
+Publish marts
+   ↓
+Dashboard reflects latest trusted state
+```
+
+### Delivery workflow
+
+```text
+Pull request / push
+      ↓
+GitHub Actions
+      ↓
+pytest + compile + dbt parse + Docker build
+      ↓
+Workload Identity Federation
+      ↓
+Artifact Registry
+      ↓
+Cloud Run deployment
+      ↓
+Scheduler configuration
+```
+
+---
+
+## Repository structure
 
 ```text
 pipeline/
-  models.py              canonical observation contract
-  hashing.py             deterministic revision fingerprints
-  refresh.py             source-isolated refresh orchestration
-  warehouse.py           append-only BigQuery adapter
-  sources/
-    knbs.py
-    cbk.py
-    world_bank.py
+├── models.py              # Canonical observation contract
+├── hashing.py             # Deterministic source fingerprints
+├── refresh.py             # Source-isolated refresh orchestration
+├── warehouse.py           # BigQuery persistence
+└── sources/
+    ├── knbs.py
+    ├── cbk.py
+    └── world_bank.py
 
 kenya_econ_dbt/
-  models/
-    staging/
-    marts/
-  profiles.yml
+├── models/
+│   ├── staging/
+│   └── marts/
+└── profiles.yml
 
 dashboard/
-  app.py
-  data.py
+├── app.py
+└── data.py
 
 infra/
-  bigquery/bootstrap.sql
-  gcp/bootstrap.sh
+├── bigquery/
+└── gcp/
 
 .github/workflows/
-  ci.yml
-  deploy.yml
+├── ci.yml
+└── deploy.yml
 
 tests/
+streamlit_app.py
 ```
+
+---
 
 ## Local development
 
@@ -206,23 +348,16 @@ pip install -r requirements-dev.txt
 pytest -q
 ```
 
-Compile check:
-
-```bash
-make compile
-```
-
-To run the dashboard locally, install its UI dependencies separately:
+Run the dashboard locally:
 
 ```bash
 pip install -r dashboard/requirements.txt
 streamlit run streamlit_app.py
 ```
 
-With Google Application Default Credentials and a GCP project configured:
+Parse the dbt project:
 
 ```bash
-cp .env.example .env
 export GCP_PROJECT_ID="your-project-id"
 export BQ_LOCATION="africa-south1"
 
@@ -232,70 +367,38 @@ dbt parse \
   --target prod
 ```
 
-## First GCP deployment
+---
 
-The bootstrap script creates the required APIs, BigQuery datasets/tables, Artifact Registry repository, service accounts, and GitHub Workload Identity Federation configuration.
+## Production
 
-```bash
-export PROJECT_ID="your-project-id"
-export GITHUB_REPO="gishusam/kenya-econ-pipeline"
-bash infra/gcp/bootstrap.sh
-```
+The platform is deployed and operating in Google Cloud.
 
-It prints the GitHub repository variables required by `.github/workflows/deploy.yml`, including separate compute and Scheduler regions.
+- **Dashboard:** [kenya-economic-intelligence.streamlit.app](https://kenya-economic-intelligence.streamlit.app/)
+- **Refresh cadence:** daily at 06:15 Africa/Nairobi
+- **Compute:** Cloud Run Jobs
+- **Warehouse:** BigQuery
+- **Transformations:** dbt
+- **CI/CD:** GitHub Actions + Workload Identity Federation
 
-After those variables are set, a push to `main` builds the container and deploys `kenya-econ-refresh`. The deploy workflow creates/updates the daily Cloud Scheduler trigger for **06:15 Africa/Nairobi**.
+---
 
-## Streamlit deployment
+## What this project demonstrates
 
-The dashboard needs:
+This repository is intentionally an end-to-end data engineering system rather than a collection of isolated notebooks.
 
-```toml
-GCP_PROJECT_ID = "your-project-id"
-BQ_LOCATION = "africa-south1"
-```
+It demonstrates:
 
-Streamlit Community Cloud must use the dedicated **read-only** dashboard service account if a credential is required. See `.streamlit/secrets.example.toml`. Do not reuse the Cloud Run or deployment identity.
+- designing ingestion around unreliable and heterogeneous external sources;
+- preserving data lineage and historical revisions;
+- separating raw, transformation, serving, and operational concerns;
+- implementing automated data-quality gates;
+- designing graceful degraded states rather than all-or-nothing ingestion;
+- applying least-privilege IAM across runtime, deployment, scheduling, and serving identities;
+- building CI/CD for cloud data workloads;
+- and operating a public analytical product from continuously refreshed production data.
 
-## CI/CD security
+---
 
-GitHub Actions uses Google Workload Identity Federation. No long-lived Google service-account JSON key is stored in GitHub.
+## License
 
-The identities are intentionally separate:
-
-- `kenya-econ-pipeline` — Cloud Run ingestion/dbt runtime;
-- `kenya-econ-scheduler` — permission to invoke the job;
-- `kenya-econ-deploy` — GitHub deployment identity;
-- `kenya-econ-dashboard` — read-only dashboard identity.
-
-## Migration from v1
-
-Version 1 demonstrated Postgres, Airflow, Kafka, dbt, and Streamlit, but several components existed primarily to demonstrate tooling rather than to serve this workload. Version 2 deliberately removes:
-
-- local Postgres and database migrations/loaders;
-- Docker Compose as the production runtime;
-- Airflow DAG/webserver/scheduler configuration;
-- Kafka, ZooKeeper, producer, and consumer processes;
-- OpenExchangeRates from the authoritative data path;
-- local raw JSON files as pipeline state.
-
-Git history preserves the original implementation; dead runtime code is not retained in a `legacy/` directory.
-
-## Current rebuild status
-
-- [x] Canonical revision-aware observation contract
-- [x] KNBS, CBK, and World Bank source adapters
-- [x] Append-only BigQuery warehouse adapter
-- [x] Source-isolated refresh runner
-- [x] BigQuery dbt staging/mart models and contracts
-- [x] Streamlit BigQuery/data-health migration
-- [x] Cloud Run container definition
-- [x] GitHub Actions CI/CD + WIF bootstrap
-- [x] Apply migration to the GitHub repository
-- [x] Bootstrap the target GCP project and execute the first live run
-- [x] Configure Streamlit Community Cloud against the new marts
-
-## Design docs
-
-- `docs/superpowers/specs/2026-08-24-autonomous-kenya-econ-design.md`
-- `docs/superpowers/plans/2026-08-24-autonomous-kenya-econ.md`
+This project is a portfolio and engineering demonstration built from publicly available economic data published by the referenced institutions.
