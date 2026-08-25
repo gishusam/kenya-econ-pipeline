@@ -35,3 +35,23 @@ def test_makefile_passes_the_environment_names_dbt_profile_reads():
 def test_streamlit_requirements_include_bigquery_dataframe_types():
     text = Path('dashboard/requirements.txt').read_text()
     assert 'db-dtypes==1.7.1' in text
+
+
+def test_raw_economic_value_supports_high_precision_source_values():
+    text = Path('infra/bigquery/bootstrap.sql').read_text()
+    assert 'value BIGNUMERIC NOT NULL' in text
+
+
+def test_staging_revision_window_qualifies_source_column():
+    text = Path(
+        'kenya_econ_dbt/models/staging/stg_economic_observations.sql'
+    ).read_text().lower()
+
+    assert 'from source as src' in text
+    normalized = ' '.join(text.split())
+    assert 'partition by src.source' in normalized
+
+
+def test_docker_image_includes_knbs_ca_chain():
+    text = Path('Dockerfile').read_text()
+    assert 'COPY certs ./certs' in text

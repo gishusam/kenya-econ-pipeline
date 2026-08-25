@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.raw.economic_observations` (
   period_start DATE NOT NULL,
   period_end DATE NOT NULL,
   frequency STRING NOT NULL,
-  value NUMERIC NOT NULL,
+  value BIGNUMERIC NOT NULL,
   unit STRING NOT NULL,
   currency STRING,
   source_published_at TIMESTAMP,

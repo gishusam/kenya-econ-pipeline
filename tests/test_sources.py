@@ -75,3 +75,113 @@ def test_world_bank_fetches_full_available_history_not_only_recent_values():
     for _, params in source.calls:
         assert params["per_page"] >= 100
         assert "mrv" not in params
+
+
+def test_knbs_builds_verified_ca_bundle_with_missing_intermediates(tmp_path):
+    from pipeline.sources.knbs import build_knbs_ca_bundle
+
+    base = tmp_path / "base.pem"
+    extra = tmp_path / "extra.pem"
+    output = tmp_path / "combined.pem"
+
+    base.write_text("BASE-CA\n")
+    extra.write_text("KNBS-EXTRA-CA\n")
+
+    result = build_knbs_ca_bundle(
+        base_bundle=base,
+        extra_bundle=extra,
+        output_bundle=output,
+    )
+
+    assert result == output
+    assert output.read_text() == "BASE-CA\nKNBS-EXTRA-CA\n"
+
+
+def test_knbs_session_uses_combined_verified_ca_bundle(tmp_path):
+    from pipeline.sources.knbs import build_knbs_session
+
+    base = tmp_path / "base.pem"
+    extra = tmp_path / "extra.pem"
+    output = tmp_path / "combined.pem"
+
+    base.write_text("BASE-CA\n")
+    extra.write_text("KNBS-EXTRA-CA\n")
+
+    session = build_knbs_session(
+        base_bundle=base,
+        extra_bundle=extra,
+        output_bundle=output,
+    )
+
+    assert session.verify == str(output)
+    assert output.read_text() == "BASE-CA\nKNBS-EXTRA-CA\n"
+
+
+def test_knbs_source_uses_verified_custom_ca_session_by_default():
+    from pipeline.sources.knbs import KNBSSource
+
+    source = KNBSSource()
+
+    assert source.session.verify is not True
+    assert str(source.session.verify).endswith(
+        "kenya-econ-knbs-ca-bundle.pem"
+    )
+
+
+def test_knbs_combines_current_reports_with_cpi_archive():
+    from pipeline.sources.knbs import (
+        ALL_REPORTS_URL,
+        CATEGORY_URL,
+        discover_cpi_reports,
+    )
+
+    current_html = """
+    <a href="https://www.knbs.or.ke/reports/consumer-price-indices-and-inflation-rates-july-2026/">
+        Consumer Price Indices and Inflation Rates – July 2026
+    </a>
+    """
+
+    archive_html = """
+    <a href="https://www.knbs.or.ke/reports/consumer-price-indices-and-inflation-rates-june-2026/">
+        Consumer Price Indices and Inflation Rates – June 2026
+    </a>
+    <a href="https://www.knbs.or.ke/reports/consumer-price-indices-and-inflation-rates-may-2026/">
+        Consumer Price Indices and Inflation Rates – May 2026
+    </a>
+    """
+
+    pages = {
+        ALL_REPORTS_URL: current_html,
+        CATEGORY_URL: archive_html,
+    }
+
+    reports = discover_cpi_reports(
+        get_text=lambda url: pages[url],
+        limit=12,
+    )
+
+    assert reports == [
+        "https://www.knbs.or.ke/reports/consumer-price-indices-and-inflation-rates-july-2026/",
+        "https://www.knbs.or.ke/reports/consumer-price-indices-and-inflation-rates-june-2026/",
+        "https://www.knbs.or.ke/reports/consumer-price-indices-and-inflation-rates-may-2026/",
+    ]
+
+
+def test_knbs_report_discovery_ignores_pdf_attachments():
+    from pipeline.sources.knbs import find_cpi_reports
+
+    html = """
+    <a href="https://www.knbs.or.ke/reports/consumer-price-indices-and-inflation-rates-july-2026/">
+        Consumer Price Indices and Inflation Rates – July 2026
+    </a>
+
+    <a href="https://www.knbs.or.ke/wp-content/uploads/2026/07/Kenya-Consumer-Price-Indices-and-Inflation-Rates-July-2026.pdf">
+        Consumer Price Indices and Inflation Rates – July 2026 PDF
+    </a>
+    """
+
+    reports = find_cpi_reports(html, limit=12)
+
+    assert reports == [
+        "https://www.knbs.or.ke/reports/consumer-price-indices-and-inflation-rates-july-2026/"
+    ]

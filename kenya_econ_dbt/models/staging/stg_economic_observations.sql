@@ -21,12 +21,19 @@ with source as (
 
 ranked as (
     select
-        *,
+        src.*,
         row_number() over (
-            partition by source, indicator_code, geography, period_start, period_end
-            order by coalesce(source_published_at, ingested_at) desc, ingested_at desc
+            partition by
+                src.source,
+                src.indicator_code,
+                src.geography,
+                src.period_start,
+                src.period_end
+            order by
+                coalesce(src.source_published_at, src.ingested_at) desc,
+                src.ingested_at desc
         ) as revision_rank
-    from source
+    from source as src
 )
 
 select
