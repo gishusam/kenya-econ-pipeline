@@ -63,7 +63,7 @@ def test_pipeline_status_is_materialized_as_view():
 
     normalized = "".join(sql.split())
 
-    assert 'config(materialized="view")' in normalized
+    assert 'materialized="view"' in normalized
 
 
 def test_repository_has_root_streamlit_entrypoint():
@@ -162,3 +162,23 @@ def test_dashboard_bigquery_access_is_least_privilege():
         "for role in roles/bigquery.jobUser roles/bigquery.dataViewer"
         not in bootstrap
     )
+
+
+def test_pipeline_status_manages_metadata_authorized_view():
+    sql = Path(
+        "kenya_econ_dbt/models/marts/pipeline_status.sql"
+    ).read_text()
+
+    normalized = "".join(sql.split())
+
+    assert "grant_access_to" in normalized
+    assert "'dataset':'metadata'" in normalized
+    assert "env_var('GCP_PROJECT_ID','kenya-econ-dev')" in normalized
+
+
+def test_pipeline_can_manage_metadata_dataset_acl():
+    bootstrap = Path("infra/gcp/bootstrap.sh").read_text()
+
+    assert "roles/bigquery.dataOwner" in bootstrap
+    assert "ON SCHEMA `${PROJECT_ID}`.metadata" in bootstrap
+    assert 'TO \\"serviceAccount:${PIPELINE_SA}\\"' in bootstrap

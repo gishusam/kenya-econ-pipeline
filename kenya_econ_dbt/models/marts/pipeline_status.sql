@@ -1,4 +1,15 @@
-{{ config(materialized="view") }}
+{{ config(
+    materialized="view",
+    grant_access_to=[
+        {
+            'project': env_var(
+                'GCP_PROJECT_ID',
+                'kenya-econ-dev'
+            ),
+            'dataset': 'metadata'
+        }
+    ]
+) }}
 
 select
     run_id,
