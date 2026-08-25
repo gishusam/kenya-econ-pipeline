@@ -101,6 +101,18 @@ sed -e "s/__PROJECT_ID__/${PROJECT_ID}/g" -e "s/__BQ_LOCATION__/${BQ_LOCATION}/g
 bq query --project_id="${PROJECT_ID}" --location="${BQ_LOCATION}" --use_legacy_sql=false < "${TMP_SQL}"
 rm -f "${TMP_SQL}"
 
+# Pipeline owns metadata ACL management so dbt can maintain
+# authorized views without granting dashboard access to metadata.
+bq query \
+  --project_id="${PROJECT_ID}" \
+  --location="${BQ_LOCATION}" \
+  --use_legacy_sql=false \
+  "
+  GRANT `roles/bigquery.dataOwner`
+  ON SCHEMA `${PROJECT_ID}`.metadata
+  TO \"serviceAccount:${PIPELINE_SA}\";
+  "
+
 # Dashboard receives read-only access only to the published marts dataset.
 bq query \
   --project_id="${PROJECT_ID}" \
