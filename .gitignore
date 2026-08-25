@@ -15,3 +15,6 @@ gha-creds-*.json
 .streamlit/secrets.toml
 service-account*.json
 gcp-service-account*.json
+
+# Local dbt user state
+kenya_econ_dbt/.user.yml
