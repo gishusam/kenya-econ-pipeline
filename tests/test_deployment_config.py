@@ -148,3 +148,17 @@ def test_dashboard_finishing_touches_are_present():
 
     # Native Streamlit delta arrows are misleading for economic semantics.
     assert "delta=" not in app
+
+
+def test_dashboard_bigquery_access_is_least_privilege():
+    bootstrap = Path("infra/gcp/bootstrap.sh").read_text()
+
+    assert '--role="roles/bigquery.jobUser"' in bootstrap
+    assert "ON SCHEMA `${PROJECT_ID}`.marts" in bootstrap
+    assert "TO \\\"serviceAccount:${DASHBOARD_SA}\\\"" in bootstrap
+
+    # Dashboard Data Viewer must not be granted project-wide.
+    assert (
+        "for role in roles/bigquery.jobUser roles/bigquery.dataViewer"
+        not in bootstrap
+    )
