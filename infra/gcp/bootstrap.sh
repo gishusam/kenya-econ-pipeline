@@ -53,11 +53,11 @@ for role in roles/bigquery.jobUser roles/bigquery.dataEditor; do
     --member="serviceAccount:${PIPELINE_SA}" --role="${role}" >/dev/null
  done
 
-# Dashboard can query and read data but cannot mutate it.
-for role in roles/bigquery.jobUser roles/bigquery.dataViewer; do
-  gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
-    --member="serviceAccount:${DASHBOARD_SA}" --role="${role}" >/dev/null
- done
+# Dashboard can create BigQuery query jobs at project level.
+# Data access itself is granted only on the marts dataset below.
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${DASHBOARD_SA}" \
+  --role="roles/bigquery.jobUser" >/dev/null
 
 # GitHub deployment identity.
 for role in roles/artifactregistry.writer roles/run.admin roles/cloudscheduler.admin; do
@@ -100,6 +100,17 @@ sed -e "s/__PROJECT_ID__/${PROJECT_ID}/g" -e "s/__BQ_LOCATION__/${BQ_LOCATION}/g
   infra/bigquery/bootstrap.sql > "${TMP_SQL}"
 bq query --project_id="${PROJECT_ID}" --location="${BQ_LOCATION}" --use_legacy_sql=false < "${TMP_SQL}"
 rm -f "${TMP_SQL}"
+
+# Dashboard receives read-only access only to the published marts dataset.
+bq query \
+  --project_id="${PROJECT_ID}" \
+  --location="${BQ_LOCATION}" \
+  --use_legacy_sql=false \
+  "
+  GRANT `roles/bigquery.dataViewer`
+  ON SCHEMA `${PROJECT_ID}`.marts
+  TO \"serviceAccount:${DASHBOARD_SA}\";
+  "
 
 cat <<OUT
 
