@@ -55,3 +55,30 @@ def test_staging_revision_window_qualifies_source_column():
 def test_docker_image_includes_knbs_ca_chain():
     text = Path('Dockerfile').read_text()
     assert 'COPY certs ./certs' in text
+
+def test_pipeline_status_is_materialized_as_view():
+    sql = Path(
+        "kenya_econ_dbt/models/marts/pipeline_status.sql"
+    ).read_text()
+
+    normalized = "".join(sql.split())
+
+    assert 'config(materialized="view")' in normalized
+
+
+def test_repository_has_root_streamlit_entrypoint():
+    entrypoint = Path("streamlit_app.py")
+
+    assert entrypoint.exists()
+
+    content = entrypoint.read_text()
+
+    assert "dashboard.app" in content
+
+
+def test_dashboard_uses_display_helpers():
+    app = Path("dashboard/app.py").read_text()
+
+    assert "prepare_snapshot_for_display" in app
+    assert "prepare_health_for_display" in app
+    assert "format_eat_timestamp" in app
