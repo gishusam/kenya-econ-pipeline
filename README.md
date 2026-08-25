@@ -1,6 +1,11 @@
 # 🇰🇪 Kenya Economic Intelligence
 
+[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-Open-FF4B4B?logo=streamlit&logoColor=white)](https://kenya-economic-intelligence.streamlit.app/)
+[![CI](https://github.com/gishusam/kenya-econ-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/gishusam/kenya-econ-pipeline/actions/workflows/ci.yml)
+
 An autonomous, revision-aware data pipeline for Kenya's core economic indicators.
+
+**Live dashboard:** https://kenya-economic-intelligence.streamlit.app/
 
 The project collects official economic observations from **KNBS**, **CBK**, and the **World Bank**, preserves source revisions in BigQuery, standardizes them with dbt, and publishes trusted marts to a Streamlit dashboard. The production path is intentionally batch-oriented: **no Airflow, no Kafka, and no always-on server**.
 
@@ -211,7 +216,7 @@ To run the dashboard locally, install its UI dependencies separately:
 
 ```bash
 pip install -r dashboard/requirements.txt
-streamlit run dashboard/app.py
+streamlit run streamlit_app.py
 ```
 
 With Google Application Default Credentials and a GCP project configured:
@@ -286,9 +291,9 @@ Git history preserves the original implementation; dead runtime code is not reta
 - [x] Streamlit BigQuery/data-health migration
 - [x] Cloud Run container definition
 - [x] GitHub Actions CI/CD + WIF bootstrap
-- [ ] Apply migration to the GitHub repository
-- [ ] Bootstrap the target GCP project and execute the first live run
-- [ ] Configure Streamlit Community Cloud against the new marts
+- [x] Apply migration to the GitHub repository
+- [x] Bootstrap the target GCP project and execute the first live run
+- [x] Configure Streamlit Community Cloud against the new marts
 
 ## Design docs
 
