@@ -73,7 +73,8 @@ def test_repository_has_root_streamlit_entrypoint():
 
     content = entrypoint.read_text()
 
-    assert "dashboard.app" in content
+    assert '"dashboard"' in content
+    assert '"app.py"' in content
 
 
 def test_dashboard_uses_display_helpers():
@@ -82,3 +83,68 @@ def test_dashboard_uses_display_helpers():
     assert "prepare_snapshot_for_display" in app
     assert "prepare_health_for_display" in app
     assert "format_eat_timestamp" in app
+
+
+def test_dashboard_uses_storytelling_layout():
+    app = Path("dashboard/app.py").read_text()
+
+    assert "build_economy_summary" in app
+    assert "indicator_context" in app
+    assert "recent_indicator_history" in app
+
+    assert "Pipeline health" in app
+    assert "Data freshness" in app
+    assert "Kenya's economy at a glance" in app
+    assert "What's changing now?" in app
+    assert "Economic performance" in app
+    assert "Sources & methodology" in app
+
+    assert "st.sidebar" in app
+
+
+def test_streamlit_entrypoint_executes_dashboard_on_every_rerun():
+    entrypoint = Path("streamlit_app.py").read_text()
+
+    # An import-only wrapper is unsafe for Streamlit reruns because
+    # Python caches imported modules in sys.modules.
+    assert "import dashboard.app" not in entrypoint
+    assert "runpy.run_path" in entrypoint
+
+
+def test_dashboard_uses_current_streamlit_width_api():
+    app = Path("dashboard/app.py").read_text()
+
+    assert "use_container_width" not in app
+    assert 'width="stretch"' in app
+
+
+def test_dashboard_uses_semantic_metric_changes():
+    app = Path("dashboard/app.py").read_text()
+
+    assert "metric_change_label" in app
+    assert "delta=" not in app
+
+
+def test_dashboard_uses_categorical_gdp_years():
+    app = Path("dashboard/app.py").read_text()
+
+    assert "annual_indicator_history" in app
+    assert 'x="year"' in app
+
+
+def test_dashboard_does_not_chart_sparse_fx_history():
+    app = Path("dashboard/app.py").read_text()
+
+    assert "has_enough_history" in app
+
+
+def test_dashboard_finishing_touches_are_present():
+    app = Path("dashboard/app.py").read_text()
+
+    assert '[data-testid="stSidebar"] div[data-testid="stMetric"]' in app
+    assert "history-building" in app
+    assert 'display_text="Open ↗"' in app
+    assert "previous_period_end" in app
+
+    # Native Streamlit delta arrows are misleading for economic semantics.
+    assert "delta=" not in app
